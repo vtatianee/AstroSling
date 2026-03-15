@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosmo Sling – Privacy Policy</title>
+<style>
+  :root{
+    --bg:#04000e; --surface:#0d0022; --border:rgba(120,60,255,.2);
+    --text:#d8d0f0; --muted:#8070a8; --accent:#9060ff; --accent2:#60b0ff;
+    --white:#fff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 15%, rgba(80,20,180,.22) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 80%, rgba(20,60,200,.18) 0%, transparent 50%);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+    line-height:1.7;
+    min-height:100vh;
+  }
+  header{
+    background:rgba(10,0,30,.72);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);
+    padding:20px 0;
+    position:sticky;top:0;z-index:10;
+  }
+  .header-inner{
+    max-width:760px;margin:0 auto;padding:0 24px;
+    display:flex;align-items:center;gap:16px;
+  }
+  .app-icon{
+    width:52px;height:52px;border-radius:12px;
+    background:linear-gradient(135deg,#3010a0,#6030ff);
+    display:flex;align-items:center;justify-content:center;
+    font-size:28px;flex-shrink:0;
+    box-shadow:0 0 18px rgba(100,40,220,.5);
+  }
+  .header-text h1{
+    font-size:20px;font-weight:700;color:var(--white);letter-spacing:.4px;
+  }
+  .header-text p{font-size:13px;color:var(--muted);margin-top:1px;}
+
+  main{max-width:760px;margin:0 auto;padding:48px 24px 80px;}
+
+  .hero{
+    text-align:center;margin-bottom:52px;
+    padding:40px 32px;
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--border);
+    border-radius:20px;
+  }
+  .hero h2{
+    font-size:32px;font-weight:800;color:var(--white);
+    background:linear-gradient(135deg,#c080ff,#60b0ff);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:10px;
+  }
+  .hero p{color:var(--muted);font-size:15px;max-width:480px;margin:0 auto;}
+  .badge{
+    display:inline-block;margin-top:20px;
+    background:rgba(80,220,120,.12);border:1px solid rgba(80,220,120,.3);
+    color:#60e090;font-size:12px;font-weight:700;letter-spacing:1.5px;
+    padding:6px 16px;border-radius:50px;text-transform:uppercase;
+  }
+
+  section{margin-bottom:44px;}
+  h3{
+    font-size:18px;font-weight:700;color:var(--white);
+    margin-bottom:14px;padding-bottom:10px;
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:10px;
+  }
+  h3 .icon{font-size:20px;}
+  p{color:var(--text);font-size:15px;margin-bottom:12px;}
+  ul{padding-left:20px;margin-bottom:12px;}
+  ul li{color:var(--text);font-size:15px;margin-bottom:6px;}
+  ul li::marker{color:var(--accent);}
+  a{color:var(--accent2);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .highlight-box{
+    background:rgba(96,176,255,.06);
+    border:1px solid rgba(96,176,255,.2);
+    border-radius:12px;padding:18px 22px;margin:16px 0;
+  }
+  .highlight-box p{margin:0;color:var(--accent2);font-weight:600;}
+
+  .no-data-box{
+    background:rgba(80,220,120,.06);
+    border:1px solid rgba(80,220,120,.25);
+    border-radius:12px;padding:22px 26px;margin:20px 0;
+    text-align:center;
+  }
+  .no-data-box .big{font-size:38px;margin-bottom:8px;}
+  .no-data-box strong{color:#70e0a0;font-size:16px;display:block;margin-bottom:6px;}
+  .no-data-box p{color:var(--muted);font-size:14px;margin:0;}
+
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+  th{background:rgba(255,255,255,.05);color:var(--white);font-weight:700;
+     padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
+  td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text);}
+  tr:last-child td{border-bottom:none;}
+  .yes{color:#60e090;font-weight:700;}
+  .no{color:var(--muted);}
+
+  .contact-card{
+    background:rgba(255,255,255,.03);border:1px solid var(--border);
+    border-radius:16px;padding:28px;text-align:center;
+  }
+  .contact-card h4{color:var(--white);font-size:17px;margin-bottom:8px;}
+  .contact-card p{color:var(--muted);font-size:14px;margin-bottom:16px;}
+  .contact-card a{
+    display:inline-block;
+    background:linear-gradient(135deg,#6030ff,#4080ff);
+    color:#fff;font-weight:700;font-size:14px;letter-spacing:.5px;
+    padding:12px 28px;border-radius:50px;
+    text-decoration:none;
+    box-shadow:0 4px 18px rgba(80,60,220,.4);
+  }
+
+  footer{
+    text-align:center;color:var(--muted);font-size:13px;
+    padding:32px 24px;border-top:1px solid var(--border);
+    margin-top:40px;
+  }
+  footer span{color:var(--accent);font-weight:700;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="app-icon">🚀</div>
+    <div class="header-text">
+      <h1>Cosmo Sling</h1>
+      <p>Privacy Policy</p>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="hero">
+    <h2>Your Privacy is Sacred</h2>
+    <p>Cosmo Sling is a single-player arcade game. We are committed to protecting your privacy and being completely transparent about how the app works.</p>
+    <div class="badge">✓ No personal data collected</div>
+  </div>
+
+  <!-- 1. Overview -->
+  <section>
+    <h3><span class="icon">📋</span> 1. Overview</h3>
+    <p>This Privacy Policy explains how <strong>Cosmo Sling</strong> ("the App", "we", "our") handles information when you play our game. This policy applies to the iOS application available on the Apple App Store.</p>
+    <p><strong>Last updated:</strong> March 2026 &nbsp;·&nbsp; <strong>Effective date:</strong> March 2026</p>
+  </section>
+
+  <!-- 2. Data We Do NOT Collect -->
+  <section>
+    <h3><span class="icon">🛡️</span> 2. Data We Do NOT Collect</h3>
+    <div class="no-data-box">
+      <div class="big">🔒</div>
+      <strong>Cosmo Sling collects zero personal data.</strong>
+      <p>We do not have servers. We do not have accounts. We do not track you.</p>
+    </div>
+    <p>Specifically, we do <strong>not</strong> collect:</p>
+    <ul>
+      <li>Name, email address, or any contact information</li>
+      <li>Device identifiers, advertising IDs (IDFA), or device fingerprints</li>
+      <li>Location data (GPS or approximate)</li>
+      <li>IP addresses or network information</li>
+      <li>Gameplay telemetry, session lengths, or analytics events</li>
+      <li>Crash reports (crashes are handled locally by iOS)</li>
+      <li>Camera, microphone, contacts, or any other device data</li>
+      <li>Payment information (the App is free with no in-app purchases)</li>
+    </ul>
+  </section>
+
+  <!-- 3. Data Stored Locally -->
+  <section>
+    <h3><span class="icon">📱</span> 3. Data Stored Locally on Your Device</h3>
+    <p>Cosmo Sling stores a small amount of data <strong>exclusively on your device</strong> using the browser's <code>localStorage</code> (or equivalent native storage). This data never leaves your device.</p>
+
+    <table>
+      <tr>
+        <th>Data Item</th>
+        <th>Purpose</th>
+        <th>Sent to server?</th>
+      </tr>
+      <tr>
+        <td>Best score (endless mode)</td>
+        <td>Display your personal high score</td>
+        <td class="no">Never</td>
+      </tr>
+      <tr>
+        <td>Level progress</td>
+        <td>Remember which levels you unlocked</td>
+        <td class="no">Never</td>
+      </tr>
+      <tr>
+        <td>Sound preferences</td>
+        <td>Remember your music/SFX settings</td>
+        <td class="no">Never</td>
+      </tr>
+    </table>
+
+    <div class="highlight-box">
+      <p>💡 You can delete all locally stored data at any time by deleting the App from your device.</p>
+    </div>
+  </section>
+
+  <!-- 4. Third-Party Services -->
+  <section>
+    <h3><span class="icon">🔗</span> 4. Third-Party Services</h3>
+    <p>Cosmo Sling does <strong>not</strong> integrate with any third-party services, including:</p>
+    <ul>
+      <li>No analytics (no Google Analytics, Firebase, Mixpanel, Amplitude, etc.)</li>
+      <li>No advertising networks (no AdMob, Meta Ads, etc.)</li>
+      <li>No social login (no Facebook, Google, Apple Sign-In)</li>
+      <li>No cloud saves or leaderboard services (no Game Center, Play Games)</li>
+      <li>No crash reporting tools (no Sentry, Crashlytics, etc.)</li>
+      <li>No CDN or external font loading during gameplay</li>
+    </ul>
+    <p>All game assets — graphics, music, and sound effects — are generated entirely on-device using the Web Audio API and HTML5 Canvas. No external network requests are made during gameplay.</p>
+  </section>
+
+  <!-- 5. Permissions -->
+  <section>
+    <h3><span class="icon">🔐</span> 5. App Permissions</h3>
+    <p>Cosmo Sling requests <strong>no special device permissions</strong>. The App does not ask for access to:</p>
+    <ul>
+      <li>Camera or microphone</li>
+      <li>Location services</li>
+      <li>Contacts or calendar</li>
+      <li>Photo library</li>
+      <li>Health or motion data</li>
+      <li>Bluetooth or NFC</li>
+      <li>Push notifications</li>
+    </ul>
+    <p>Audio playback uses the standard iOS audio session and does not require any special permission.</p>
+  </section>
+
+  <!-- 6. Children's Privacy -->
+  <section>
+    <h3><span class="icon">👶</span> 6. Children's Privacy</h3>
+    <p>Cosmo Sling is rated <strong>4+</strong> on the Apple App Store and is suitable for all ages, including children under 13.</p>
+    <p>Because we collect <strong>no personal data whatsoever</strong>, we are fully compliant with:</p>
+    <ul>
+      <li><strong>COPPA</strong> – Children's Online Privacy Protection Act (United States)</li>
+      <li><strong>GDPR-K</strong> – GDPR provisions for children (European Union)</li>
+      <li><strong>Apple's Kids Category</strong> guidelines</li>
+    </ul>
+    <p>No parental consent is required to play, as no personal information is collected, transmitted, or stored externally.</p>
+  </section>
+
+  <!-- 7. Data Security -->
+  <section>
+    <h3><span class="icon">🔒</span> 7. Data Security</h3>
+    <p>Since no data is collected or transmitted, there is no risk of data breach from our side. The only data that exists (your local scores and settings) is protected by the iOS sandbox — other apps cannot access it.</p>
+  </section>
+
+  <!-- 8. GDPR & CCPA -->
+  <section>
+    <h3><span class="icon">🌍</span> 8. Your Rights (GDPR & CCPA)</h3>
+    <p>Because Cosmo Sling does not collect personal data, most data rights requests are not applicable. However, if you are located in the European Union (GDPR) or California (CCPA), you have the right to:</p>
+    <ul>
+      <li><strong>Access</strong> – Request confirmation of what data we hold (answer: none)</li>
+      <li><strong>Deletion</strong> – Request deletion of your data (done by uninstalling the App)</li>
+      <li><strong>Portability</strong> – Export your data (no data to export)</li>
+      <li><strong>Opt-out</strong> – Opt out of sale of personal data (we sell nothing)</li>
+    </ul>
+    <p>To exercise any of these rights, or if you have any questions, contact us at the address below.</p>
+  </section>
+
+  <!-- 9. Apple App Store -->
+  <section>
+    <h3><span class="icon">🍎</span> 9. Apple App Store & Apple's Privacy Labels</h3>
+    <p>In accordance with Apple's App Privacy requirements, Cosmo Sling declares the following in the App Store privacy nutrition label:</p>
+
+    <table>
+      <tr>
+        <th>Category</th>
+        <th>Collected?</th>
+        <th>Linked to identity?</th>
+        <th>Used for tracking?</th>
+      </tr>
+      <tr>
+        <td>Contact Info</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td>Health & Fitness</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td>Financial Info</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td>Location</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td>Sensitive Info</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td>Identifiers</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td>Usage Data</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td>Diagnostics</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+      </tr>
+    </table>
+
+    <div class="highlight-box">
+      <p>✅ Cosmo Sling qualifies for the Apple "Data Not Collected" label — the highest privacy designation on the App Store.</p>
+    </div>
+  </section>
+
+  <!-- 10. Changes -->
+  <section>
+    <h3><span class="icon">📝</span> 10. Changes to This Policy</h3>
+    <p>If we ever change this Privacy Policy (for example, if a future version of the App adds new features that require data collection), we will update this page and change the "Last updated" date at the top.</p>
+    <p>We encourage you to review this policy periodically. Continued use of the App after any changes constitutes acceptance of the updated policy.</p>
+  </section>
+
+  <!-- 11. Contact -->
+  <section>
+    <h3><span class="icon">✉️</span> 11. Contact Us</h3>
+    <p>If you have any questions, concerns, or requests regarding this Privacy Policy or the App, please contact us:</p>
+    <div class="contact-card">
+      <h4>Cosmo Sling Support</h4>
+      <p>We aim to respond to all privacy inquiries within 5 business days.</p>
+      <!-- ⚠️ Replace with your real email before submitting to App Store -->
+      <a href="mailto:privacy@cosmosling.app">privacy@cosmosling.app</a>
+    </div>
+    <p style="margin-top:14px;font-size:13px;color:var(--muted);">
+      ⚠️ <em>Before App Store submission, replace the email above with your real contact email address, and host this page at a publicly accessible URL (e.g. <code>https://yoursite.com/privacy</code>). The App Store Connect requires a live URL.</em>
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  <p>© 2026 <span>Cosmo Sling</span>. All rights reserved.</p>
+  <p style="margin-top:6px;">This policy is written in plain language intentionally — no data, no legalese needed.</p>
+</footer>
+
+</body>
+</html>

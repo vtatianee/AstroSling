@@ -54,7 +54,6 @@
   /* Screens sit above both canvases */
   #titleScreen,#menuScreen{z-index:2;}
   /* HUD, modals above screens */
-  #hud{position:absolute;inset:0;pointer-events:none;display:none;z-index:5;}
   #confirmModal,#lvlTransition,#adOverlay{z-index:10;}
   #attModal,#aboutModal{z-index:20;}
   /* About button lives INSIDE titleScreen so it inherits its z-index */
@@ -81,7 +80,10 @@
   .level-btn.locked{opacity:.32;cursor:not-allowed;}
   .level-stars{font-size:9px;letter-spacing:1px;color:#ffd040;opacity:.9;}
 
-  /* HUD — compact floating elements */
+  /* HUD */
+  #hud{position:absolute;inset:0;pointer-events:none;display:none;z-index:5;}
+
+  /* Menu button — top-left */
   #hudMenuBtn{
     position:absolute;top:14px;left:14px;
     width:42px;height:42px;border-radius:12px;
@@ -92,17 +94,81 @@
     display:flex;align-items:center;justify-content:center;
     transition:all .14s;box-shadow:0 2px 12px rgba(0,0,0,.5);
   }
-  #hudMenuBtn:active{transform:scale(.88);background:rgba(30,10,60,.85);}
+  #hudMenuBtn:active{transform:scale(.88);}
 
-  #hudLevelBadge{
-    position:absolute;top:14px;left:50%;transform:translateX(-50%);
-    display:flex;align-items:center;
-    background:rgba(6,0,22,.62);backdrop-filter:blur(14px);
-    border:1px solid rgba(255,255,255,.07);border-radius:50px;
-    padding:6px 14px;box-shadow:0 2px 12px rgba(0,0,0,.4);
+  /* Sound button — top-right */
+  #hudSoundBtn{
+    position:absolute;top:14px;right:14px;
+    width:42px;height:42px;border-radius:12px;
+    background:rgba(6,0,22,.72);backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.14);
+    color:rgba(255,255,255,.75);font-size:18px;
+    cursor:pointer;pointer-events:all;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .14s;box-shadow:0 2px 12px rgba(0,0,0,.5);
+  }
+  #hudSoundBtn:active{transform:scale(.88);}
+
+  /* Bottom bar — holds all 3 bottom elements */
+  #hudBottom{
+    position:absolute;bottom:0;left:0;right:0;
+    padding:0 12px 16px;
+    display:flex;align-items:flex-end;justify-content:space-between;
     pointer-events:none;
   }
-  #hudLevelBadge #hudLevel{font-family:'Fredoka One',cursive;font-size:14px;color:rgba(255,255,255,.88);letter-spacing:.5px;white-space:nowrap;}
+
+  /* Bottom-left: level label */
+  #hudLevelLabel{
+    font-family:'Fredoka One',cursive;font-size:13px;
+    color:rgba(200,180,255,.85);letter-spacing:2px;
+    background:rgba(6,0,22,.62);backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.07);border-radius:10px;
+    padding:6px 12px;white-space:nowrap;
+    box-shadow:0 2px 10px rgba(0,0,0,.4);
+  }
+
+  /* Bottom-center: attempts */
+  #hudAttemptsBox{
+    display:flex;flex-direction:column;align-items:center;gap:5px;
+  }
+  #hudAttemptsText{
+    font-family:'Fredoka One',cursive;font-size:11px;
+    color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;
+  }
+  .attempts-pill{
+    display:flex;gap:8px;align-items:center;
+    background:rgba(6,0,22,.62);backdrop-filter:blur(10px);
+    border-radius:50px;border:1px solid rgba(255,255,255,.07);
+    padding:8px 18px;box-shadow:0 2px 12px rgba(0,0,0,.4);
+  }
+  .attempt-dot{
+    width:13px;height:13px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#ffb06a,#ff4c0c);
+    box-shadow:0 0 7px rgba(255,80,20,.65),0 0 14px rgba(255,60,0,.25);
+    transition:all .3s ease;
+  }
+  .attempt-dot.used{background:rgba(255,255,255,.07);box-shadow:none;border:1px solid rgba(255,255,255,.1);}
+
+  /* Bottom-right: shuffle button */
+  #hudShuffleBtn{
+    width:52px;height:52px;border-radius:14px;
+    border:2px solid rgba(255,200,60,.45);
+    background:rgba(30,15,0,.75);backdrop-filter:blur(10px);
+    color:rgba(255,210,80,.95);font-size:22px;
+    cursor:pointer;
+    display:none; /* hidden by default */
+    flex-direction:column;align-items:center;justify-content:center;gap:1px;
+    pointer-events:all;transition:opacity .18s,transform .18s;
+    box-shadow:0 2px 14px rgba(200,140,0,.35);flex-shrink:0;
+  }
+  #hudShuffleBtn span{
+    font-size:8px;letter-spacing:.5px;
+    color:rgba(255,200,60,.7);font-family:'Nunito',sans-serif;
+    font-weight:700;text-transform:uppercase;
+  }
+  #hudShuffleBtn:active{transform:scale(.88);}
+  #hudShuffleBtn.visible{display:flex;}
+  #hudShuffleBtn.used{display:none!important;}
 
   /* IN-GAME MENU MODAL */
   #inGameMenu{
@@ -121,13 +187,6 @@
   .igm-title{font-family:'Fredoka One',cursive;font-size:26px;color:#fff;letter-spacing:2px;margin-bottom:4px;}
   .igm-level{font-size:12px;color:rgba(160,130,255,.65);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
   .igm-btn{width:100%;min-width:unset;margin:0;}
-
-  /* ATTEMPTS */
-  .attempts-container{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;}
-  .attempts-pill{display:flex;gap:8px;align-items:center;background:rgba(6,0,22,.55);backdrop-filter:blur(10px);border-radius:50px;border:1px solid rgba(255,255,255,.07);padding:8px 16px;box-shadow:0 2px 12px rgba(0,0,0,.4);}
-  .attempts-label{font-family:'Fredoka One',cursive;font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.28);text-transform:uppercase;}
-  .attempt-dot{width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffb06a,#ff4c0c);box-shadow:0 0 7px rgba(255,80,20,.65),0 0 14px rgba(255,60,0,.25);transition:all .3s ease;}
-  .attempt-dot.used{background:rgba(255,255,255,.07);box-shadow:none;border:1px solid rgba(255,255,255,.1);}
 
   /* PAUSE */
   #pauseScreen{background:rgba(4,0,16,.92);backdrop-filter:blur(20px);}
@@ -241,25 +300,44 @@
   /* Music toggle button (pause screen etc.) */
   .music-toggle-btn{transition:opacity .2s;}
 
-  /* Shuffle planets button — fixed bottom-left corner, only visible during active play */
-  #hudShuffleBtn{
-    position:absolute;left:12px;bottom:90px;
-    width:56px;height:56px;border-radius:14px;
-    border:2px solid rgba(255,200,60,.45);
-    background:rgba(30,15,0,.75);backdrop-filter:blur(10px);
-    color:rgba(255,210,80,.95);font-size:24px;
-    cursor:pointer;display:none;/* hidden by default — shown only during gameplay */
-    flex-direction:column;align-items:center;justify-content:center;gap:1px;
-    pointer-events:all;transition:opacity .18s,transform .18s;
-    box-shadow:0 2px 14px rgba(200,140,0,.35);
+  /* PURCHASE MODAL */
+  #purchaseModal{
+    position:absolute;inset:0;z-index:500;
+    background:rgba(2,0,12,.92);backdrop-filter:blur(22px);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .25s;
   }
-  #hudShuffleBtn span{font-size:8px;letter-spacing:.5px;color:rgba(255,200,60,.7);font-family:'Nunito',sans-serif;font-weight:700;text-transform:uppercase;}
-  #hudShuffleBtn:active{transform:scale(.88);}
-  /* .visible = show it; .used = hide it once rocket is launched */
-  #hudShuffleBtn.visible{display:flex;}
-  #hudShuffleBtn.used{display:none!important;}
+  #purchaseModal.active{opacity:1;pointer-events:all;}
+  .purchase-box{
+    background:linear-gradient(160deg,rgba(20,8,50,.98),rgba(10,4,28,.98));
+    border:1px solid rgba(200,160,60,.3);border-radius:24px;
+    padding:32px 28px;width:310px;
+    display:flex;flex-direction:column;align-items:center;gap:12px;
+    box-shadow:0 8px 50px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04);
+  }
+  .purchase-icon{font-size:44px;margin-bottom:2px;}
+  .purchase-title{font-family:'Fredoka One',cursive;font-size:22px;color:#ffd060;text-align:center;letter-spacing:.5px;}
+  .purchase-price{font-family:'Fredoka One',cursive;font-size:36px;color:#fff;margin:2px 0;}
+  .purchase-desc{font-size:13px;color:rgba(220,210,240,.6);text-align:center;line-height:1.55;}
+  .purchase-perks{width:100%;background:rgba(255,255,255,.04);border-radius:12px;padding:12px 16px;display:flex;flex-direction:column;gap:6px;}
+  .purchase-perk{font-size:13px;color:rgba(220,215,240,.75);display:flex;align-items:center;gap:8px;}
+  .purchase-perk::before{content:'✓';color:#60e090;font-weight:700;flex-shrink:0;}
+  .purchase-confirm{width:100%;padding:14px;font-family:'Fredoka One',cursive;font-size:17px;letter-spacing:.5px;
+    background:linear-gradient(160deg,#c8860a,#7a4e00);color:#fff;border:none;border-radius:50px;
+    cursor:pointer;box-shadow:0 4px 0 rgba(60,25,0,.7),0 8px 18px rgba(180,100,0,.28);transition:all .12s;}
+  .purchase-confirm:active{transform:translateY(2px);}
+  .purchase-cancel{font-size:13px;color:rgba(255,255,255,.3);cursor:pointer;padding:6px;transition:color .15s;}
+  .purchase-cancel:hover{color:rgba(255,255,255,.55);}
 
-  /* AD OVERLAY */
+  /* SUCCESS TOAST */
+  #purchaseToast{
+    position:absolute;bottom:100px;left:50%;transform:translateX(-50%);z-index:600;
+    background:rgba(30,160,70,.95);border-radius:50px;
+    padding:12px 24px;font-family:'Fredoka One',cursive;font-size:15px;color:#fff;
+    white-space:nowrap;opacity:0;pointer-events:none;
+    transition:opacity .3s;box-shadow:0 4px 20px rgba(0,0,0,.5);
+  }
+  #purchaseToast.show{opacity:1;}
   #adOverlay{position:absolute;inset:0;z-index:300;background:rgba(2,0,10,.94);backdrop-filter:blur(18px);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
   #adOverlay.active{opacity:1;pointer-events:all;}
   .ad-label{font-size:10px;letter-spacing:3px;color:rgba(255,255,255,.28);text-transform:uppercase;margin-bottom:10px;}
@@ -337,7 +415,9 @@
     <div class="title-logo">COSMO<br>SLING</div>
     <div class="title-sub">Arcade Space Puzzles</div>
     <div style="height:32px"></div>
-    <button class="btn btn-primary" style="min-width:200px" onclick="Game.showMenu()">PLAY</button>
+    <button type="button" class="btn btn-primary" id="titlePlayBtn" style="min-width:200px;position:relative;z-index:30;pointer-events:all;" onclick="return Game.startFirstLevel(event)">▶ PLAY</button>
+    <div style="height:8px"></div>
+    <button class="btn btn-ghost btn-sm" id="titleSelectBtn" style="min-width:200px">SELECT LEVEL</button>
     <div style="height:10px"></div>
     <button class="btn btn-gold btn-sm" id="titleRemoveAdsBtn" style="min-width:200px" onclick="Game.showRemoveAds()">⭐ REMOVE ADS — $2.99</button>
     <div style="height:10px"></div>
@@ -351,7 +431,7 @@
   <div id="menuScreen" class="screen">
     <div class="title-logo" style="font-size:40px">COSMO SLING</div>
     <div style="height:22px"></div>
-    <button class="btn btn-primary" style="min-width:200px" onclick="Game.showLevelSelect()">PLAY</button>
+    <button type="button" class="btn btn-primary" id="menuPlayBtn" style="min-width:200px;position:relative;z-index:30;pointer-events:all;" onclick="return Game.startFirstLevel(event)">▶ PLAY</button>
     <div style="height:10px"></div>
     <button class="btn btn-gold btn-sm" id="removeAdsMenuBtn" style="min-width:200px" onclick="Game.showRemoveAds()">⭐ REMOVE ADS — $2.99</button>
     <div style="height:8px"></div>
@@ -374,19 +454,23 @@
 
   <!-- HUD -->
   <div id="hud">
-    <!-- Small floating Menu button — top-left -->
-    <button id="hudMenuBtn" onclick="Game.openInGameMenu()" title="Menu">☰</button>
-    <!-- Level label — top-center -->
-    <div id="hudLevelBadge"><span id="hudLevel">LEVEL 1</span><span id="hudStars" style="display:flex;gap:3px;align-items:center;margin-left:6px"></span></div>
-    <div class="attempts-container">
-      <div class="attempts-pill" id="attemptsRow"></div>
-      <div class="attempts-label">SHOTS LEFT</div>
+    <!-- Menu button — top-left -->
+    <button id="hudMenuBtn">☰</button>
+    <!-- Sound toggle — top-right -->
+    <button id="hudSoundBtn">🔊</button>
+    <!-- Bottom bar -->
+    <div id="hudBottom">
+      <!-- Bottom-left: level label -->
+      <div id="hudLevelLabel">LEVEL 1</div>
+      <!-- Bottom-center: attempts counter -->
+      <div id="hudAttemptsBox">
+        <div id="hudAttemptsText">SHOTS LEFT: 5/5</div>
+        <div class="attempts-pill" id="attemptsRow"></div>
+      </div>
+      <!-- Bottom-right: shuffle button -->
+      <button id="hudShuffleBtn">🔀<span>SHUFFLE</span></button>
     </div>
-    <!-- Floating sound toggle -->
-    <button id="hudSoundBtn" onclick="Game.toggleAllAudio()" title="Toggle Sound">🔊</button>
-    <!-- Shuffle planets (only before first launch) -->
-    <button id="hudShuffleBtn" onclick="Game.shufflePlanets()" title="Shuffle planet positions">🔀<span>SHUFFLE</span></button>
-  </div>
+  </div><!-- end hud -->
 
   <!-- IN-GAME MENU MODAL -->
   <div id="inGameMenu">
@@ -398,6 +482,27 @@
       <button class="btn btn-ghost igm-btn" onclick="Game.goToMainMenu()">⌂ MAIN MENU</button>
     </div>
   </div>
+
+  <!-- PURCHASE MODAL — Remove Ads $2.99 -->
+  <div id="purchaseModal">
+    <div class="purchase-box">
+      <div class="purchase-icon">⭐</div>
+      <div class="purchase-title">Remove All Ads</div>
+      <div class="purchase-price">$2.99</div>
+      <div class="purchase-desc">One-time purchase. No subscription. Ads removed permanently.</div>
+      <div class="purchase-perks">
+        <div class="purchase-perk">No ads between levels</div>
+        <div class="purchase-perk">Skip waiting time</div>
+        <div class="purchase-perk">Support the developer</div>
+        <div class="purchase-perk">Restored automatically on reinstall</div>
+      </div>
+      <button class="purchase-confirm" onclick="AdManager.confirmPurchase()">BUY FOR $2.99</button>
+      <div class="purchase-cancel" onclick="AdManager.cancelPurchase()">No thanks</div>
+    </div>
+  </div>
+
+  <!-- SUCCESS TOAST -->
+  <div id="purchaseToast">✅ Ads removed! Thank you! 🚀</div>
 
   <!-- AD OVERLAY -->
   <div id="adOverlay">
@@ -800,16 +905,28 @@ const AdManager={
   get noAds(){return localStorage.getItem(this._noAdsKey)==='1';},
 
   purchaseRemoveAds(){
-    // In production: StoreKit / Google Play Billing via Capacitor
-    // @capacitor-community/in-app-purchase-2 or RevenueCat
-    // For now: simulate purchase confirmation
-    if(confirm('Purchase "Remove Ads" for $0.99?\n(Demo: click OK to simulate purchase)')){
-      localStorage.setItem(this._noAdsKey,'1');
-      this._syncRemoveAdsUI();
-      alert('✅ Ads removed! Thank you for your support!');
-    }
+    // Show the in-game purchase modal
+    const m=document.getElementById('purchaseModal');
+    if(m) m.classList.add('active');
   },
 
+  confirmPurchase(){
+    // In production: replace with StoreKit (iOS) via Capacitor
+    // import { InAppPurchase2 } from '@ionic-native/in-app-purchase-2'
+    // store.register({ id:'com.cosmosling.removeads', type: store.NON_CONSUMABLE })
+    // store.order('com.cosmosling.removeads')
+    localStorage.setItem(this._noAdsKey,'1');
+    const m=document.getElementById('purchaseModal');
+    if(m)m.classList.remove('active');
+    this._syncRemoveAdsUI();
+    // Show success toast
+    const t=document.getElementById('purchaseToast');
+    if(t){t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+  },
+  cancelPurchase(){
+    const m=document.getElementById('purchaseModal');
+    if(m)m.classList.remove('active');
+  },
   _syncRemoveAdsUI(){
     const noAds=this.noAds;
     const label=noAds?'✅ ADS REMOVED':'⭐ REMOVE ADS — $2.99';
@@ -1969,15 +2086,20 @@ const GameState={
   startLevel(idx){
     this.currentLevelIndex=idx;this.attempts=MAX_ATTEMPTS;this.starsCollected=0;
     this.playing=true;this.paused=false;this.endless=false;
-    PhysicsEngine.reset(LEVELS[idx]);this.updateHUD();showScreen(null);
-    document.getElementById('hud').style.display='';
+    PhysicsEngine.reset(LEVELS[idx]);
+    // Hide all screens and bg canvas, show HUD
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    const bg=document.getElementById('bgStarsCanvas');if(bg)bg.style.display='none';
+    const igm=document.getElementById('inGameMenu');if(igm)igm.classList.remove('active');
+    const hud=document.getElementById('hud');if(hud)hud.style.display='block';
+    this.updateHUD();
     Music.playRandom();
   },
   startEndlessMode(){
     this.endless=true;this.endlessScore=0;this.attempts=MAX_ATTEMPTS;this.starsCollected=0;
     this.playing=true;this.paused=false;
     PhysicsEngine.reset(generateEndlessLevel(0));this.updateHUD();showScreen(null);
-    document.getElementById('hud').style.display='';
+    document.getElementById('hud').style.display='block';
     Music.playRandom();
   },
   onMiss(){
@@ -2030,43 +2152,47 @@ const GameState={
     },600);
   },
   updateHUD(){
-    document.getElementById('hudLevel').textContent=this.endless?`${this.endlessScore} PTS`:`LEVEL ${this.currentLevelIndex+1}`;
-    // Stars
-    const starEl=document.getElementById('hudStars');
-    const max=PhysicsEngine.stars?PhysicsEngine.stars.length:3;
-    starEl.innerHTML='';
-    for(let i=0;i<max;i++){
-      const pip=document.createElement('div');
-      pip.style.cssText='width:16px;height:16px;display:flex;align-items:center;justify-content:center;transition:transform .2s;'+(i<this.starsCollected?'transform:scale(1.2)':'');
-      pip.innerHTML=i<this.starsCollected
-        ?'<svg width="16" height="16" viewBox="-8-8 16 16"><polygon points="0,-7 2,-2.5 7,-2.5 3,1 4.5,6.5 0,3.5 -4.5,6.5 -3,1 -7,-2.5 -2,-2.5" fill="#ffd030" stroke="rgba(255,255,200,.5)" stroke-width=".5"/></svg>'
-        :'<svg width="16" height="16" viewBox="-8-8 16 16"><polygon points="0,-7 2,-2.5 7,-2.5 3,1 4.5,6.5 0,3.5 -4.5,6.5 -3,1 -7,-2.5 -2,-2.5" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1"/></svg>';
-      starEl.appendChild(pip);
-    }
-    // Attempts (5 dots)
+    // Level label — bottom-left
+    const lvlEl=document.getElementById('hudLevelLabel');
+    if(lvlEl) lvlEl.textContent=this.endless?`SCORE: ${this.endlessScore}`:`LEVEL ${this.currentLevelIndex+1}`;
+    // Attempts text — "SHOTS LEFT: X/5"
+    const attText=document.getElementById('hudAttemptsText');
+    if(attText) attText.textContent=`SHOTS LEFT: ${this.attempts}/${MAX_ATTEMPTS}`;
+    // Attempts dots
     const attEl=document.getElementById('attemptsRow');
-    attEl.innerHTML='';
-    for(let i=0;i<MAX_ATTEMPTS;i++){
-      const d=document.createElement('div');d.className='attempt-dot'+(i>=this.attempts?' used':'');attEl.appendChild(d);
+    if(attEl){
+      attEl.innerHTML='';
+      for(let i=0;i<MAX_ATTEMPTS;i++){
+        const d=document.createElement('div');
+        d.className='attempt-dot'+(i>=this.attempts?' used':'');
+        attEl.appendChild(d);
+      }
     }
   },
   pause() {if(!this.playing)return;this.paused=true;const m=document.getElementById('inGameMenu');if(m){document.getElementById('igmLevel').textContent=`LEVEL ${this.currentLevelIndex+1}`;m.classList.add('active');}},
-  resume(){this.paused=false;const m=document.getElementById('inGameMenu');if(m)m.classList.remove('active');document.getElementById('hud').style.display='';},
+  resume(){this.paused=false;const m=document.getElementById('inGameMenu');if(m)m.classList.remove('active');document.getElementById('hud').style.display='block';},
   restart(){this.startLevel(this.currentLevelIndex);}
 };
 
 // ── UI & SCREENS ──────────────────────────────────────────
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('hud').style.display='none';
-  document.getElementById('confirmModal').classList.remove('active');
+  const hud=document.getElementById('hud');
+  if(hud)hud.style.display='none';
+  const cm=document.getElementById('confirmModal');
+  if(cm)cm.classList.remove('active');
+  const igm=document.getElementById('inGameMenu');
+  if(igm)igm.classList.remove('active');
   const sb=document.getElementById('hudShuffleBtn');
   if(sb){sb.classList.remove('visible');sb.classList.remove('used');}
-  // Show starfield bg only on title and menu screens
+  // Show starfield bg on title, menu and level-select screens
   const bg=document.getElementById('bgStarsCanvas');
-  const showBg=(id==='titleScreen'||id==='menuScreen');
-  if(bg) bg.style.display=showBg?'block':'none';
-  if(id)document.getElementById(id).classList.add('active');
+  const showBg=(id==='titleScreen'||id==='menuScreen'||id==='levelScreen');
+  if(bg)bg.style.display=showBg?'block':'none';
+  if(id){
+    const el=document.getElementById(id);
+    if(el)el.classList.add('active');
+  }
   if(id==='titleScreen'||id==='menuScreen'||id==='levelScreen')Music.play(0);
 }
 
@@ -2125,6 +2251,7 @@ const Game={
     GameState.paused=false;
     const m=document.getElementById('inGameMenu');
     if(m)m.classList.remove('active');
+    document.getElementById('hud').style.display='block';
     Music.resume();
   },
   restartCurrent(){
@@ -2181,6 +2308,15 @@ const Game={
     if(next<LEVELS.length)GameState.startLevel(next);
     else{buildLevelGrid();showScreen('levelScreen');}
   }
+};
+
+// Robust PLAY entry point — works with click, pointerup, touchend, and inline onclick
+Game.startFirstLevel=function(event){
+  if(event){event.preventDefault();event.stopPropagation();}
+  Music.resume();
+  Audio.resumeCtx();
+  GameState.startLevel(0);
+  return false;
 };
 
 // ── FULLSCREEN NEON STARFIELD BACKGROUND ─────────────────
@@ -2516,6 +2652,43 @@ const Game={
 
 Background.init();GameState.init();Slingshot.init(canvas);
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
+
+// ── Expose globals so inline handlers and console access works ──
+window.Game=Game;
+window.GameState=GameState;
+window.Music=Music;
+window.Audio=Audio;
+window.ATT=ATT;
+window.AdManager=AdManager;
+
+// ── Bind all important UI buttons via addEventListener ──
+function initUIBindings(){
+  // PLAY buttons — bind all 3 event types for maximum compatibility
+  ['titlePlayBtn','menuPlayBtn'].forEach(id=>{
+    const btn=document.getElementById(id);
+    if(!btn)return;
+    ['click','pointerup','touchend'].forEach(evtType=>{
+      btn.addEventListener(evtType,function(e){Game.startFirstLevel(e);},{passive:false});
+    });
+  });
+
+  // SELECT LEVEL
+  const titleSelect=document.getElementById('titleSelectBtn');
+  if(titleSelect) titleSelect.addEventListener('click',()=>Game.showLevelSelect());
+
+  // HUD buttons
+  const hudMenu=document.getElementById('hudMenuBtn');
+  if(hudMenu) hudMenu.addEventListener('click',()=>Game.openInGameMenu());
+  const hudSound=document.getElementById('hudSoundBtn');
+  if(hudSound) hudSound.addEventListener('click',()=>Game.toggleAllAudio());
+  const hudShuffle=document.getElementById('hudShuffleBtn');
+  if(hudShuffle) hudShuffle.addEventListener('click',()=>Game.shufflePlanets());
+
+  // About button
+  const aboutBtn=document.getElementById('aboutBtn');
+  if(aboutBtn) aboutBtn.addEventListener('click',()=>Game.showAbout());
+}
+initUIBindings();
 // Show starfield on initial title screen
 const _bgCv=document.getElementById('bgStarsCanvas');
 if(_bgCv)_bgCv.style.display='block';

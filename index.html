@@ -3,32 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>COSMO SLING</title>
+<title>ASTRO SLING</title>
 <!-- ═══ APPLE / PWA META TAGS ════════════════════════════
      Required for iOS full-screen experience and App Store
      submission via Capacitor / Cordova wrapper.
      ════════════════════════════════════════════════════ -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Cosmo Sling">
-<meta name="application-name" content="Cosmo Sling">
+<meta name="apple-mobile-web-app-title" content="AstroSling">
+<meta name="application-name" content="AstroSling">
 <meta name="theme-color" content="#04000e">
-<meta name="description" content="Cosmo Sling – Retro arcade space physics puzzle game. Sling your NASA shuttle through the cosmos!">
+<meta name="description" content="AstroSling – Retro arcade space physics puzzle game. Sling your spacecraft through the cosmos!">
 <meta name="keywords" content="space game, arcade, puzzle, physics, slingshot, retro">
-<meta name="author" content="Cosmo Sling">
-<meta property="og:title" content="COSMO SLING">
+<meta name="author" content="AstroSling">
+<meta property="og:title" content="ASTRO SLING">
 <meta property="og:description" content="Retro arcade space physics puzzle game">
 <meta property="og:type" content="website">
 <!-- iOS touch icons – replace data URI with actual 180×180 PNG before App Store submission -->
 <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' rx='40' fill='%2304000e'/%3E%3Ccircle cx='90' cy='90' r='60' fill='none' stroke='%236030ff' stroke-width='3'/%3E%3Ctext x='90' y='105' font-size='56' text-anchor='middle' fill='white'%3E🚀%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" sizes="152x152" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='152' height='152'%3E%3Crect width='152' height='152' rx='34' fill='%2304000e'/%3E%3Ctext x='76' y='95' font-size='72' text-anchor='middle' fill='white'%3E🚀%3C/text%3E%3C/svg%3E">
 <!-- Web App Manifest (inline JSON; also create /manifest.json before publishing) -->
-<script type="application/json" id="pwa-manifest">{"name":"Cosmo Sling","short_name":"CosmoSling","description":"Retro arcade space physics puzzle game","start_url":"/","display":"fullscreen","orientation":"portrait","background_color":"#04000e","theme_color":"#04000e","categories":["games"],"icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png"}]}</script>
+<script type="application/json" id="pwa-manifest">{"name":"AstroSling","short_name":"AstroSling","description":"Retro arcade space physics puzzle game","start_url":"/","display":"fullscreen","orientation":"portrait","background_color":"#04000e","theme_color":"#04000e","categories":["games"],"icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png"}]}</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:#04000e;display:flex;justify-content:center;align-items:center;height:100vh;overflow:hidden;font-family:'Nunito',sans-serif;touch-action:none;user-select:none;}
-  #gameContainer{position:relative;width:390px;height:844px;overflow:hidden;border-radius:14px;
+  #gameContainer{position:relative;width:390px;height:844px;overflow:hidden;border-radius:14px;z-index:1;
     box-shadow:0 0 0 1px rgba(120,60,255,0.25),0 0 40px rgba(100,40,220,0.45),0 0 100px rgba(60,20,160,0.35);}
   /* Only the main game canvas fills the container */
   #gameCanvas{display:block;width:100%;height:100%;position:absolute;inset:0;z-index:0;}
@@ -47,8 +47,8 @@
   /* MENU */
   #menuScreen{background:transparent;gap:12px;}
 
-  /* Full-screen neon starfield background canvas — hidden by default, shown only on title/menu */
-  #bgStarsCanvas{position:absolute;inset:0;width:390px;height:844px;z-index:1;pointer-events:none;display:none;}
+  /* Full-screen neon starfield background canvas — always visible behind everything */
+  #bgStarsCanvas{position:fixed;top:50%;left:50%;width:390px;height:844px;z-index:0;pointer-events:none;transform:translate(-50%,-50%);}
   /* Planet canvas inside title screen — fixed size, NOT filling container */
   #titlePlanetCanvas{width:160px;height:160px;flex-shrink:0;display:block;}
   /* Screens sit above both canvases */
@@ -277,7 +277,7 @@
   .lvlt-nextlabel.in{opacity:1;transform:translateY(0);}
 
   /* BUTTONS */
-  .btn{font-family:'Fredoka One',cursive;font-size:19px;padding:12px 36px;border-radius:50px;border:1px solid rgba(255,255,255,.09);cursor:pointer;transition:transform .1s,filter .1s;letter-spacing:1px;pointer-events:all;position:relative;overflow:hidden;}
+  .btn{font-family:'Fredoka One',cursive;font-size:19px;padding:12px 36px;border-radius:50px;border:1px solid rgba(255,255,255,.09);cursor:pointer;transition:transform .1s,filter .1s;letter-spacing:1px;position:relative;overflow:hidden;}
   .btn::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:rgba(255,255,255,.07);border-radius:50px 50px 0 0;pointer-events:none;}
   .btn:active{transform:translateY(2px) scale(.97);filter:brightness(.88);}
   .btn-primary{background:linear-gradient(160deg,#9030ff 0%,#5010bb 100%);color:#fff;box-shadow:0 4px 0 rgba(30,0,80,.7),0 8px 18px rgba(120,40,255,.28);}
@@ -354,6 +354,67 @@
   /* REMOVE ADS button */
   .btn-gold{background:linear-gradient(160deg,#c8860a 0%,#7a4e00 100%);color:#fff;box-shadow:0 4px 0 rgba(60,25,0,.7),0 8px 18px rgba(180,100,0,.28);}
 
+  /* ACHIEVEMENT NOTIFICATION TOAST */
+  #achievementToast{
+    position:absolute;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);z-index:700;
+    background:linear-gradient(135deg,rgba(20,8,50,.97),rgba(10,4,28,.97));
+    border:1px solid rgba(200,160,60,.45);border-radius:50px;
+    padding:10px 20px;display:flex;align-items:center;gap:10px;
+    white-space:nowrap;opacity:0;pointer-events:none;
+    transition:opacity .35s,transform .35s;
+    box-shadow:0 4px 24px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);
+  }
+  #achievementToast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .ach-toast-icon{font-size:22px;}
+  .ach-toast-body{display:flex;flex-direction:column;gap:1px;}
+  .ach-toast-label{font-size:9px;letter-spacing:3px;color:rgba(255,200,60,.7);text-transform:uppercase;font-family:'Nunito',sans-serif;font-weight:700;}
+  .ach-toast-name{font-family:'Fredoka One',cursive;font-size:15px;color:#fff;letter-spacing:.5px;}
+
+  /* SCORE FLASH */
+  .score-flash{
+    position:absolute;font-family:'Fredoka One',cursive;font-size:16px;color:#ffd040;
+    text-shadow:0 0 8px rgba(200,140,0,.8);pointer-events:none;z-index:8;
+    animation:scoreFloat .9s ease-out forwards;white-space:nowrap;
+  }
+  @keyframes scoreFloat{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-52px);}}
+
+  /* ACHIEVEMENTS in About modal */
+  .ach-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%;}
+  .ach-item{
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+    border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:8px;
+  }
+  .ach-item.earned{background:rgba(200,160,30,.12);border-color:rgba(200,160,30,.3);}
+  .ach-item-icon{font-size:18px;flex-shrink:0;}
+  .ach-item-info{display:flex;flex-direction:column;gap:1px;}
+  .ach-item-name{font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,.85);letter-spacing:.3px;}
+  .ach-item-desc{font-size:9px;color:rgba(255,255,255,.35);line-height:1.3;}
+  .ach-item.locked .ach-item-icon{filter:grayscale(1);opacity:.4;}
+  .ach-item.locked .ach-item-name{color:rgba(255,255,255,.3);}
+
+  /* TUTORIAL OVERLAY */
+  #tutorialOverlay{
+    position:absolute;inset:0;z-index:400;pointer-events:none;
+    opacity:0;transition:opacity .4s;
+  }
+  #tutorialOverlay.show{opacity:1;pointer-events:all;}
+  .tut-hint{
+    position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px;
+    pointer-events:none;
+  }
+  .tut-arrow{font-size:28px;animation:tutBounce 1s ease-in-out infinite;}
+  @keyframes tutBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+  .tut-text{
+    font-family:'Fredoka One',cursive;font-size:14px;color:rgba(255,255,255,.9);
+    background:rgba(0,0,0,.55);border-radius:20px;padding:6px 14px;
+    text-align:center;letter-spacing:.5px;border:1px solid rgba(255,255,255,.14);
+  }
+  #tutDismiss{
+    position:absolute;bottom:160px;left:50%;transform:translateX(-50%);
+    font-family:'Fredoka One',cursive;font-size:13px;color:rgba(255,255,255,.35);
+    letter-spacing:2px;cursor:pointer;pointer-events:all;padding:8px 16px;
+  }
+
   /* ATT MODAL (Apple style) */
   #attModal{position:absolute;inset:0;z-index:400;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
   #attModal.active{opacity:1;pointer-events:all;}
@@ -403,16 +464,16 @@
 </style>
 </head>
 <body>
+<canvas id="bgStarsCanvas" width="390" height="844"></canvas>
 <div id="gameContainer">
   <canvas id="gameCanvas"></canvas>
-  <canvas id="bgStarsCanvas" width="390" height="844"></canvas>
 
   <!-- TITLE -->
   <div id="titleScreen" class="screen active">
     <!-- About button inside title screen, top-left -->
     <button id="aboutBtn" onclick="Game.showAbout()">ℹ️ About</button>
     <canvas id="titlePlanetCanvas" width="160" height="160" style="margin-bottom:18px"></canvas>
-    <div class="title-logo">COSMO<br>SLING</div>
+    <div class="title-logo">ASTRO<br>SLING</div>
     <div class="title-sub">Arcade Space Puzzles</div>
     <div style="height:32px"></div>
     <button type="button" class="btn btn-primary" id="titlePlayBtn" style="min-width:200px;position:relative;z-index:30;pointer-events:all;" onclick="return Game.startFirstLevel(event)">▶ PLAY</button>
@@ -429,10 +490,12 @@
 
   <!-- MENU -->
   <div id="menuScreen" class="screen">
-    <div class="title-logo" style="font-size:40px">COSMO SLING</div>
+    <div class="title-logo" style="font-size:40px">ASTRO SLING</div>
     <div style="height:22px"></div>
     <button type="button" class="btn btn-primary" id="menuPlayBtn" style="min-width:200px;position:relative;z-index:30;pointer-events:all;" onclick="return Game.startFirstLevel(event)">▶ PLAY</button>
     <div style="height:10px"></div>
+    <button class="btn btn-blue btn-sm" style="min-width:200px" onclick="Game.startEndless()">♾️ ENDLESS MODE</button>
+    <div style="height:8px"></div>
     <button class="btn btn-gold btn-sm" id="removeAdsMenuBtn" style="min-width:200px" onclick="Game.showRemoveAds()">⭐ REMOVE ADS — $2.99</button>
     <div style="height:8px"></div>
     <button class="btn btn-ghost btn-sm" onclick="Game.showTitle()">← BACK</button>
@@ -504,13 +567,31 @@
   <!-- SUCCESS TOAST -->
   <div id="purchaseToast">✅ Ads removed! Thank you! 🚀</div>
 
+  <!-- ACHIEVEMENT NOTIFICATION TOAST -->
+  <div id="achievementToast">
+    <div class="ach-toast-icon" id="achToastIcon">🏆</div>
+    <div class="ach-toast-body">
+      <div class="ach-toast-label">Achievement Unlocked</div>
+      <div class="ach-toast-name" id="achToastName">First Steps</div>
+    </div>
+  </div>
+
+  <!-- TUTORIAL OVERLAY (level 1 first run) -->
+  <div id="tutorialOverlay">
+    <div class="tut-hint" style="bottom:230px;left:50%;transform:translateX(-50%)">
+      <div class="tut-arrow">👆</div>
+      <div class="tut-text">Drag the ship backward<br>then release to launch!</div>
+    </div>
+    <div id="tutDismiss">TAP TO DISMISS</div>
+  </div>
+
   <!-- AD OVERLAY -->
   <div id="adOverlay">
     <div class="ad-label">Advertisement</div>
     <div class="ad-box">
       <div class="ad-logo">🚀</div>
-      <div class="ad-title">Cosmo Sling Premium</div>
-      <div class="ad-sub">Remove all ads and support<br>the game for just $0.99</div>
+      <div class="ad-title">AstroSling Premium</div>
+      <div class="ad-sub">Remove all ads and support<br>the game for just $2.99</div>
       <!-- Real AdMob banner/interstitial goes here via Capacitor AdMob plugin -->
       <!-- admob-plus or @capacitor-community/admob -->
       <div style="width:300px;height:60px;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-top:8px;">
@@ -526,7 +607,7 @@
   <div id="attModal">
     <div class="att-box">
       <div class="att-icon">🚀</div>
-      <div class="att-title">Allow "Cosmo Sling" to track your activity?</div>
+      <div class="att-title">Allow "AstroSling" to track your activity?</div>
       <div class="att-body">Your data will be used to deliver personalized ads. This helps keep the game free.</div>
       <div class="att-divider"></div>
       <div class="att-btns">
@@ -543,43 +624,17 @@
       <button class="about-close" onclick="Game.closeAbout()">✕</button>
     </div>
     <div class="about-body">
-      <div class="about-section" style="text-align:center">
-        <div class="about-app-icon">🚀</div>
-        <div style="font-family:'Fredoka One',cursive;font-size:20px;color:#fff;">Cosmo Sling</div>
-        <div class="about-version">VERSION 1.0.0 · 2026</div>
-      </div>
-      <div class="about-section">
-        <h3>🎮 The Game</h3>
-        <p>Cosmo Sling is a retro arcade physics puzzle game. Use a slingshot to launch your spacecraft through gravitational fields, collect stars and reach the target in each galaxy.</p>
-        <p>Features 10 hand-crafted levels across 5 galaxies, endless mode, 6 original chiptune tracks and procedurally generated music.</p>
-      </div>
       <div class="about-section">
         <h3>✉️ Contact & Support</h3>
         <p>Questions, feedback or bug reports:</p>
-        <a href="/cdn-cgi/l/email-protection#2754525757485553674448544a48544b4e494009465757"><span class="__cf_email__" data-cfemail="5c2f292c2c332e281c3f332f31332f3035323b723d2c2c">[email&#160;protected]</span></a>
+        <a href="mailto:support@astrosling.app">support@astrosling.app</a>
         <p style="margin-top:8px">Response time: within 5 business days.</p>
       </div>
       <div class="about-section">
         <h3>⚖️ Legal</h3>
-        <p>© 2026 Cosmo Sling. All rights reserved.</p>
-        <p>All game assets, music and sound effects are generated procedurally.</p>
+        <p>© 2026 AstroSling. All rights reserved.</p>
         <a href="https://cosmosling.app/privacy" target="_blank" style="margin-top:6px">Privacy Policy ↗</a>
         <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" target="_blank" style="margin-top:4px">Terms of Use (EULA) ↗</a>
-      </div>
-      <div class="about-section">
-        <h3>📢 Ads & Purchases</h3>
-        <p>The free version shows ads between levels. Purchase <strong style="color:rgba(255,210,80,.9)">"Remove Ads"</strong> once for $2.99 for a permanent ad-free experience.</p>
-        <p>Ads are provided by Google AdMob. You can change your tracking preference at any time in <strong style="color:rgba(180,210,255,.8)">iOS Settings → Privacy → Tracking</strong>.</p>
-      </div>
-      <div class="about-section">
-        <h3>🔒 Your Data</h3>
-        <p>Cosmo Sling does <strong style="color:rgba(100,220,150,.85)">not</strong> collect personal data. Your score and preferences are stored only on your device and never transmitted.</p>
-      </div>
-      <div class="about-section">
-        <h3>🌟 Credits</h3>
-        <p>Game Design, Code & Music: Cosmo Sling Team</p>
-        <p>Built with HTML5 Canvas & Web Audio API.</p>
-        <p>Fonts: Fredoka One & Nunito via Google Fonts.</p>
       </div>
     </div>
   </div>
@@ -658,7 +713,7 @@
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 'use strict';
 // ═══════════════════════════════════════════
-//  COSMO SLING — v3 (spaceship + UFO update)
+//  ASTRO SLING — v4 (achievements + 25 levels)
 // ═══════════════════════════════════════════
 
 const canvas=document.getElementById('gameCanvas');
@@ -873,7 +928,7 @@ const Music=(()=>{
 // In production (Capacitor): replace with @capacitor-community/app-tracking-transparency
 // requestTrackingAuthorization() from the plugin
 const ATT={
-  _key:'cosmo_att_asked',
+  _key:'cosmo_att',
   init(){
     if(localStorage.getItem(this._key))return; // already asked
     setTimeout(()=>{
@@ -982,6 +1037,130 @@ const AdManager={
 };
 
 
+// ── ACHIEVEMENTS ──────────────────────────────────────────
+const ACHIEVEMENT_DEFS=[
+  {id:'first_steps',   icon:'🚀', name:'First Steps',      desc:'Complete your first level'},
+  {id:'star_hunter',   icon:'⭐', name:'Star Hunter',      desc:'Collect 3 stars in one level'},
+  {id:'stargazer',     icon:'🌟', name:'Stargazer',        desc:'Collect 30 stars total'},
+  {id:'sharpshooter',  icon:'🎯', name:'Sharpshooter',     desc:'Complete a level on the first shot'},
+  {id:'persistent',    icon:'💪', name:'Persistent',       desc:'Complete a level using all 5 shots'},
+  {id:'bounce_master', icon:'🔵', name:'Bounce Master',    desc:'Bounce off walls 10 times total'},
+  {id:'portal_jumper', icon:'🌀', name:'Portal Jumper',    desc:'Use a portal 5 times total'},
+  {id:'gravity_dancer',icon:'🌌', name:'Gravity Dancer',   desc:'Complete a reverse gravity level'},
+  {id:'endless_drifter',icon:'♾️',name:'Endless Drifter',  desc:'Score 500+ in endless mode'},
+  {id:'galaxy_explorer',icon:'🔭',name:'Galaxy Explorer',  desc:'Complete all 10 original levels'},
+  {id:'master_sling',  icon:'🏆', name:'Master Sling',     desc:'Complete all 25 levels'},
+];
+
+const Achievements=(()=>{
+  const _key='astro_achievements';
+  let _unlocked=new Set();
+  let _toastTimer=null;
+
+  // Counters tracked at runtime
+  const _counts={bounces:0,portals:0,totalStars:0};
+
+  function _save(){localStorage.setItem(_key,JSON.stringify([..._unlocked]));}
+  function _load(){
+    try{const d=JSON.parse(localStorage.getItem(_key)||'[]');_unlocked=new Set(d);}catch(e){_unlocked=new Set();}
+  }
+
+  function _notify(id){
+    const def=ACHIEVEMENT_DEFS.find(a=>a.id===id);if(!def)return;
+    const toast=document.getElementById('achievementToast');
+    if(!toast)return;
+    document.getElementById('achToastIcon').textContent=def.icon;
+    document.getElementById('achToastName').textContent=def.name;
+    toast.classList.add('show');
+    clearTimeout(_toastTimer);
+    _toastTimer=setTimeout(()=>toast.classList.remove('show'),3200);
+  }
+
+  function _unlock(id){
+    if(_unlocked.has(id))return;
+    _unlocked.add(id);_save();_notify(id);
+  }
+
+  return{
+    init(){_load();},
+
+    // Call after each level win
+    onLevelWin(levelIdx,stars,attemptsUsed,isEndless,endlessScore){
+      if(!isEndless){
+        // First level completed
+        if(levelIdx===0) _unlock('first_steps');
+        // 3 stars in one level
+        if(stars>=3) _unlock('star_hunter');
+        // First shot win
+        if(attemptsUsed===1) _unlock('sharpshooter');
+        // Used all shots (MAX_ATTEMPTS - 0 remaining means MAX_ATTEMPTS used)
+        if(attemptsUsed>=MAX_ATTEMPTS) _unlock('persistent');
+        // Reverse gravity level (level index 9 = level 10, or 21 = level 22)
+        if([9,21].includes(levelIdx)) _unlock('gravity_dancer');
+        // All 10 original levels (index 0-9)
+        if(levelIdx===9){
+          const prog=GameState.levelProgress;
+          if(prog.slice(0,10).every(p=>p>=1)) _unlock('galaxy_explorer');
+        }
+        // All 25 levels
+        if(levelIdx===24){
+          if(GameState.levelProgress.every(p=>p>=1)) _unlock('master_sling');
+        }
+      }
+      // Endless mode score milestone
+      if(isEndless&&endlessScore>=500) _unlock('endless_drifter');
+    },
+
+    onStarsCollected(total){
+      _counts.totalStars=total;
+      if(total>=30) _unlock('stargazer');
+    },
+
+    onBounce(){
+      _counts.bounces++;
+      if(_counts.bounces>=10) _unlock('bounce_master');
+    },
+
+    onPortal(){
+      _counts.portals++;
+      if(_counts.portals>=5) _unlock('portal_jumper');
+    },
+
+    get unlocked(){return _unlocked;},
+    getAll(){return ACHIEVEMENT_DEFS.map(d=>({...d,earned:_unlocked.has(d.id)}));}
+  };
+})();
+
+// ── TUTORIAL (level 1 first-run hint) ─────────────────────
+const Tutorial={
+  _key:'astro_tutorial_done',
+  _dismissed:false,
+
+  shouldShow(){
+    return !localStorage.getItem(this._key)&&!this._dismissed;
+  },
+
+  show(){
+    const el=document.getElementById('tutorialOverlay');
+    if(el)el.classList.add('show');
+    // Auto-dismiss after 6s
+    setTimeout(()=>this.dismiss(),6000);
+    // Dismiss on tap
+    const dis=document.getElementById('tutDismiss');
+    if(dis) dis.addEventListener('click',()=>this.dismiss(),{once:true});
+  },
+
+  dismiss(){
+    this._dismissed=true;
+    localStorage.setItem(this._key,'1');
+    const el=document.getElementById('tutorialOverlay');
+    if(el){el.style.opacity='0';setTimeout(()=>{el.classList.remove('show');el.style.opacity='';},400);}
+  },
+
+  // Called on first slingshot drag
+  onFirstDrag(){if(!this._dismissed)this.dismiss();}
+};
+
 const lerp=(a,b,t)=>a+(b-a)*t;
 const dist=(ax,ay,bx,by)=>Math.hypot(bx-ax,by-ay);
 const clamp=(v,mn,mx)=>Math.max(mn,Math.min(mx,v));
@@ -1022,6 +1201,31 @@ const Particles={
     for(let i=0;i<count;i++){const a=rand(0,Math.PI*2),sp=rand(speed*.3,speed);this.list.push(new Particle(x,y,Math.cos(a)*sp,Math.sin(a)*sp,color,rand(.4,.9),size,type));}
   },
   trail(x,y,color){if(this.list.length<200)this.list.push(new Particle(x,y,rand(-6,6),rand(-6,6),color,.2,2.2));},
+  spawnLaunch(x,y,angle){
+    for(let i=0;i<12;i++){
+      const a=angle+Math.PI+(Math.random()-.5)*1.1;
+      const sp=rand(60,200);
+      if(this.list.length<200)
+        this.list.push(new Particle(x,y,Math.cos(a)*sp,Math.sin(a)*sp,Math.random()<.5?'#ffcc40':'#ff8820',rand(.3,.7),rand(2.5,5)));
+    }
+  },
+  spawnBoost(x,y,angle,color){
+    for(let i=0;i<8;i++){
+      const a=angle+(Math.random()-.5)*.8,sp=rand(120,260);
+      if(this.list.length<200)
+        this.list.push(new Particle(x,y,Math.cos(a)*sp,Math.sin(a)*sp,color,rand(.3,.6),rand(2,4.5)));
+    }
+  },
+  spawnExplosion(x,y){
+    const cols=['#ff4400','#ff8820','#ffcc40','#ff2200','#ffffff'];
+    for(let i=0;i<25;i++){
+      const a=rand(0,Math.PI*2),sp=rand(200,450);
+      if(this.list.length<200)
+        this.list.push(new Particle(x,y,Math.cos(a)*sp,Math.sin(a)*sp,cols[randInt(0,4)],rand(.5,.9),rand(3,7)));
+    }
+    if(this.list.length<200)this.list.push(new Particle(x,y,0,0,'#ff6030',.6,30,'ring'));
+    if(this.list.length<200)this.list.push(new Particle(x,y,0,0,'#ffaa40',.4,20,'ring'));
+  },
   update(dt){this.list=this.list.filter(p=>{p.update(dt);return p.life>0;});},
   draw(ctx){this.list.forEach(p=>p.draw(ctx));},
   clear(){this.list=[];}
@@ -1050,25 +1254,8 @@ const Background={
   },
   update(dt){this.t+=dt;},
   draw(ctx){
-    const g=ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,'#07001a');g.addColorStop(.45,'#05000f');g.addColorStop(1,'#020008');
-    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-    this.nebulas.forEach(n=>{
-      ctx.save();ctx.translate(n.x,n.y);ctx.rotate(n.rot+this.t*.018);ctx.scale(1,n.ry/n.rx);
-      const ng=ctx.createRadialGradient(0,0,0,0,0,n.rx);
-      ng.addColorStop(0,n.col+(n.a*1.4)+')');ng.addColorStop(.5,n.col+n.a+')');ng.addColorStop(1,n.col+'0)');
-      ctx.fillStyle=ng;ctx.beginPath();ctx.arc(0,0,n.rx,0,Math.PI*2);ctx.fill();ctx.restore();
-    });
-    const alphas=[.52,.76,1];
-    this.layers.forEach((layer,li)=>{
-      layer.forEach(s=>{
-        const tw=.5+.5*Math.sin(this.t*s.speed+s.phase);
-        ctx.globalAlpha=s.b*tw*alphas[li];
-        ctx.fillStyle=li===2?(s.phase%1>.5?'#fff8f0':'#f0f4ff'):'#ffffff';
-        ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();
-      });
-    });
-    ctx.globalAlpha=1;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='rgba(4,0,20,0.55)';ctx.fillRect(0,0,W,H);
   }
 };
 
@@ -1129,7 +1316,7 @@ class Planet{
   }
   
   draw(ctx){
-    const x=this.x,y=this.y,r=this.radius,rev=this.reverse;
+    const x=this.x,y=this.y,r=this.radius*(1+.015*Math.sin(this.t*2)),rev=this.reverse;
     const gravR=this.gravRange;
     
     // Gravity field zone
@@ -1233,8 +1420,8 @@ class Portal{
   checkBall(ball){
     if(this.cooldown>0)return;
     const da=dist(ball.x,ball.y,this.a.x,this.a.y),db=dist(ball.x,ball.y,this.b.x,this.b.y);
-    if(da<17){ball.x=this.b.x;ball.y=this.b.y;this.cooldown=.5;Audio.portal();Particles.spawn(this.b.x,this.b.y,this.color,12,105);}
-    else if(db<17){ball.x=this.a.x;ball.y=this.a.y;this.cooldown=.5;Audio.portal();Particles.spawn(this.a.x,this.a.y,this.color,12,105);}
+    if(da<17){ball.x=this.b.x;ball.y=this.b.y;this.cooldown=.5;Audio.portal();Particles.spawn(this.b.x,this.b.y,this.color,12,105);Achievements.onPortal();}
+    else if(db<17){ball.x=this.a.x;ball.y=this.a.y;this.cooldown=.5;Audio.portal();Particles.spawn(this.a.x,this.a.y,this.color,12,105);Achievements.onPortal();}
   }
 }
 
@@ -1256,7 +1443,7 @@ class Booster{
     if(this.triggered)return;
     if(dist(ball.x,ball.y,this.x,this.y)<21){
       ball.vx+=Math.cos(this.angle)*this.strength;ball.vy+=Math.sin(this.angle)*this.strength;
-      this.triggered=true;Audio.boost();Particles.spawn(this.x,this.y,this.color,13,135);
+      this.triggered=true;Audio.boost();Particles.spawnBoost(this.x,this.y,this.angle,this.color);
     }
   }
 }
@@ -1282,6 +1469,7 @@ class Wall{
       const ov=ball.radius+4-d;ball.x+=nx*ov;ball.y+=ny*ov;
       const dot=ball.vx*nx+ball.vy*ny;ball.vx-=2*dot*nx;ball.vy-=2*dot*ny;ball.vx*=.85;ball.vy*=.85;
       Audio.bounce();Particles.spawn(cx,cy,this.color,7,65);Shake.trigger(3,.1);
+      Achievements.onBounce();
     }
   }
 }
@@ -1317,7 +1505,7 @@ class Star{
     if(dist(ball.x,ball.y,this.x,this.y)<22){
       this.collected=true;Audio.star();
       Particles.spawn(this.x,this.y,'#ffd040',13,105);Particles.spawn(this.x,this.y,'#ffffa0',8,75,'ring',26);
-      spawnScoreFlash(this.x,this.y,'+50 ★');return true;
+      spawnScoreFlash(this.x,this.y,'+50 ★');Shake.trigger(1,.15);return true;
     }
     return false;
   }
@@ -1394,8 +1582,7 @@ class Ship{
     PhysicsEngine.hasLaunched=true;
     const sb=document.getElementById('hudShuffleBtn');
     if(sb){sb.classList.remove('visible');sb.classList.add('used');}
-    Particles.spawn(this.x,this.y,'#60c0ff',8,120);
-    Particles.spawn(this.x,this.y,'#ffffff',5,80);
+    Particles.spawnLaunch(this.x,this.y,Math.atan2(vy,vx));
   }
   update(dt){
     if(!this.active)return;
@@ -1757,6 +1944,7 @@ const Slingshot={
       this.active=true;this.launched=false;
       this.startX=ship.x;this.startY=ship.y;
       this.curX=p.x;this.curY=p.y;
+      Tutorial.onFirstDrag();
     }
   },
 
@@ -1929,6 +2117,18 @@ const PhysicsEngine={
     UFOManager.update(dt);
     if(this.ball.active){
       this.planets.forEach(p=>p.applyGravity(this.ball,dt));
+      // Planet collision
+      let _planetHit=false;
+      this.planets.forEach(p=>{
+        if(_planetHit)return;
+        if(dist(this.ball.x,this.ball.y,p.x,p.y)<p.radius+this.ball.radius-4){
+          _planetHit=true;
+          Particles.spawnExplosion(this.ball.x,this.ball.y);
+          Audio.fail();Shake.trigger(3,.3);
+          this.ball.active=false;GameState.onMiss();
+        }
+      });
+      if(_planetHit)return;
       this.ball.update(dt);
       this.portals.forEach(p=>p.checkBall(this.ball));
       this.boosters.forEach(b=>b.checkBall(this.ball));
@@ -2057,21 +2257,136 @@ const LEVELS=[
    stars:[{x:160,y:640},{x:310,y:460},{x:90,y:270}]},
   {id:10,galaxy:'Galaxy 5  ·  Reverse Gravity',ballX:195,ballY:650,targetX:195,targetY:120,
    planets:[{x:80,y:410,radius:30,gravity:200,color:'#4060ff',color2:'#8090ff'},{x:310,y:410,radius:30,gravity:200,color:'#4060ff',color2:'#8090ff'},{x:195,y:350,radius:26,gravity:180,color:'#ff4040',color2:'#ff8080',reverse:true}],
-   stars:[{x:80,y:560},{x:310,y:560},{x:195,y:230}]}
+   stars:[{x:80,y:560},{x:310,y:560},{x:195,y:230}]},
+
+  // ── GALAXY 6 · Gravity Dance ──
+  {id:11,galaxy:'Galaxy 6  ·  Gravity Dance',ballX:50,ballY:700,targetX:340,targetY:120,
+   planets:[{x:120,y:520,radius:28,gravity:150,color:'#4080ff',color2:'#80b0ff'},{x:270,y:380,radius:32,gravity:160,color:'#8040ff',color2:'#c080ff'},{x:170,y:260,radius:25,gravity:135,color:'#40c0ff',color2:'#80e0ff'}],
+   stars:[{x:180,y:580},{x:220,y:420},{x:300,y:220}]},
+  {id:12,galaxy:'Galaxy 6  ·  Gravity Dance',ballX:40,ballY:650,targetX:350,targetY:150,
+   planets:[{x:100,y:490,radius:30,gravity:155,color:'#ff8040',color2:'#ffc080'},{x:195,y:380,radius:42,gravity:200,color:'#4060ff',color2:'#8090ff',ringColor:'rgba(80,180,255,0.42)'},{x:300,y:270,radius:26,gravity:135,color:'#ff40a0',color2:'#ff80c0'}],
+   stars:[{x:150,y:560},{x:240,y:430},{x:320,y:300}]},
+  {id:13,galaxy:'Galaxy 6  ·  Gravity Dance',ballX:195,ballY:730,targetX:195,targetY:140,
+   planets:[{x:80,y:500,radius:28,gravity:145,color:'#40ffa0',color2:'#80ffc0'},{x:310,y:500,radius:28,gravity:145,color:'#40ffa0',color2:'#80ffc0'},{x:80,y:310,radius:24,gravity:130,color:'#ff8040',color2:'#ffc080'},{x:310,y:310,radius:24,gravity:130,color:'#ff8040',color2:'#ffc080'}],
+   stars:[{x:195,y:620},{x:155,y:405},{x:235,y:405}]},
+
+  // ── GALAXY 7 · Mixed Mechanics ──
+  {id:14,galaxy:'Galaxy 7  ·  Mixed Mechanics',ballX:60,ballY:680,targetX:60,targetY:130,
+   planets:[{x:195,y:430,radius:35,gravity:170,color:'#4080ff',color2:'#80c0ff'}],
+   boosters:[{x:300,y:600,angle:-Math.PI*3/4,strength:260,color:'#ffcc00'}],
+   walls:[{x1:280,y1:200,x2:320,y2:500,color:'#40c0ff'}],
+   stars:[{x:200,y:580},{x:300,y:370},{x:80,y:310}]},
+  {id:15,galaxy:'Galaxy 7  ·  Mixed Mechanics',ballX:40,ballY:700,targetX:350,targetY:120,
+   planets:[{x:130,y:480,radius:30,gravity:150,color:'#ff6040',color2:'#ff9080'},{x:280,y:350,radius:28,gravity:145,color:'#40ff80',color2:'#80ffc0'}],
+   boosters:[{x:180,y:650,angle:-Math.PI/2+0.3,strength:255,color:'#ff40a0'},{x:270,y:580,angle:-Math.PI/4,strength:220,color:'#40ffcc'}],
+   stars:[{x:120,y:600},{x:220,y:450},{x:310,y:220}]},
+  {id:16,galaxy:'Galaxy 7  ·  Mixed Mechanics',ballX:50,ballY:680,targetX:340,targetY:180,
+   planets:[{x:150,y:420,radius:32,gravity:160,color:'#8040ff',color2:'#c080ff'}],
+   portals:[{ax:280,ay:640,bx:280,by:200,color:'#00ffcc'}],
+   boosters:[{x:280,y:700,angle:-Math.PI/2,strength:250,color:'#ffcc00'}],
+   stars:[{x:150,y:600},{x:280,y:450},{x:300,y:280}]},
+
+  // ── GALAXY 8 · The Labyrinth ──
+  {id:17,galaxy:'Galaxy 8  ·  The Labyrinth',ballX:60,ballY:700,targetX:330,targetY:130,
+   planets:[{x:195,y:430,radius:36,gravity:170,color:'#4060ff',color2:'#8090ff'}],
+   walls:[{x1:280,y1:620,x2:280,y2:350,color:'#40c0ff'},{x1:130,y1:350,x2:130,y2:220,color:'#a040ff'}],
+   stars:[{x:200,y:640},{x:200,y:280},{x:310,y:240}]},
+  {id:18,galaxy:'Galaxy 8  ·  The Labyrinth',ballX:40,ballY:680,targetX:350,targetY:160,
+   planets:[{x:130,y:460,radius:28,gravity:145,color:'#ff8040',color2:'#ffc080'},{x:290,y:300,radius:30,gravity:155,color:'#4080ff',color2:'#80c0ff'}],
+   walls:[{x1:220,y1:580,x2:320,y2:480,color:'#40ff80'},{x1:80,y1:360,x2:180,y2:260,color:'#ff4040'}],
+   stars:[{x:160,y:600},{x:250,y:430},{x:130,y:230}]},
+  {id:19,galaxy:'Galaxy 8  ·  The Labyrinth',ballX:60,ballY:720,targetX:60,targetY:120,
+   planets:[{x:195,y:440,radius:38,gravity:180,color:'#8040ff',color2:'#c080ff'},{x:310,y:620,radius:22,gravity:120,color:'#40c0ff',color2:'#80e0ff'}],
+   walls:[{x1:120,y1:560,x2:280,y2:480,color:'#40ff80'},{x1:280,y1:380,x2:160,y2:260,color:'#ff8040'},{x1:80,y1:280,x2:80,y2:160,color:'#40c0ff'}],
+   portals:[{ax:340,ay:560,bx:130,by:350,color:'#ff80ff'}],
+   stars:[{x:200,y:650},{x:330,y:400},{x:120,y:200}]},
+
+  // ── GALAXY 9 · Black Holes ──
+  {id:20,galaxy:'Galaxy 9  ·  Black Holes',ballX:60,ballY:680,targetX:330,targetY:150,
+   planets:[{x:195,y:400,radius:22,gravity:400,color:'#111122',color2:'#2828aa',ringColor:'rgba(100,60,255,0.55)'}],
+   stars:[{x:90,y:520},{x:300,y:520},{x:195,y:240}]},
+  {id:21,galaxy:'Galaxy 9  ·  Black Holes',ballX:40,ballY:700,targetX:350,targetY:130,
+   planets:[{x:130,y:460,radius:20,gravity:380,color:'#0a0a20',color2:'#2020a0'},{x:290,y:300,radius:20,gravity:350,color:'#0a0a20',color2:'#2040b0'}],
+   stars:[{x:80,y:600},{x:195,y:380},{x:320,y:220}]},
+  {id:22,galaxy:'Galaxy 9  ·  Black Holes',ballX:195,ballY:720,targetX:195,targetY:130,
+   planets:[{x:130,y:430,radius:22,gravity:360,color:'#0a0a20',color2:'#2020a0'},{x:280,y:430,radius:22,gravity:360,color:'#0a0a20',color2:'#2020a0'},{x:195,y:310,radius:26,gravity:200,color:'#ff4040',color2:'#ff8080',reverse:true}],
+   stars:[{x:195,y:600},{x:80,y:330},{x:310,y:330}]},
+
+  // ── GALAXY 10 · Final Frontier ──
+  {id:23,galaxy:'Galaxy 10  ·  Final Frontier',ballX:50,ballY:700,targetX:340,targetY:140,
+   planets:[{x:120,y:480,radius:30,gravity:155,color:'#4080ff',color2:'#80c0ff'},{x:300,y:350,radius:28,gravity:145,color:'#8040ff',color2:'#c080ff'}],
+   walls:[{x1:200,y1:580,x2:280,y2:440,color:'#40c0ff'}],
+   portals:[{ax:320,ay:650,bx:60,by:300,color:'#ff80ff'}],
+   boosters:[{x:180,y:680,angle:-Math.PI/3,strength:240,color:'#ffcc00'}],
+   stars:[{x:160,y:620},{x:260,y:480},{x:100,y:220}]},
+  {id:24,galaxy:'Galaxy 10  ·  Final Frontier',ballX:60,ballY:680,targetX:60,targetY:150,
+   planets:[{x:195,y:480,radius:42,gravity:200,color:'#4060ff',color2:'#8090ff',ringColor:'rgba(100,180,255,0.42)'},{x:100,y:290,radius:24,gravity:130,color:'#ff8040',color2:'#ffc080'},{x:310,y:320,radius:26,gravity:140,color:'#40ff80',color2:'#80ffc0'}],
+   walls:[{x1:290,y1:580,x2:350,y2:380,color:'#ff4040'},{x1:50,y1:440,x2:140,y2:340,color:'#8040ff'}],
+   boosters:[{x:280,y:660,angle:-Math.PI/2+0.5,strength:260,color:'#ffcc00'}],
+   stars:[{x:195,y:600},{x:300,y:430},{x:130,y:210}]},
+  {id:25,galaxy:'Galaxy 10  ·  Final Frontier',ballX:195,ballY:760,targetX:195,targetY:120,
+   planets:[{x:100,y:450,radius:22,gravity:380,color:'#0a0a20',color2:'#2020a0'},{x:300,y:450,radius:22,gravity:380,color:'#0a0a20',color2:'#2020a0'},{x:195,y:320,radius:28,gravity:220,color:'#ff4040',color2:'#ff8080',reverse:true}],
+   portals:[{ax:80,ay:650,bx:310,by:200,color:'#00ffcc'}],
+   walls:[{x1:80,y1:310,x2:160,y2:240,color:'#8040ff'},{x1:230,y1:240,x2:310,y2:310,color:'#8040ff'}],
+   stars:[{x:195,y:620},{x:80,y:220},{x:310,y:220}]}
 ];
 
 // ── ENDLESS GENERATOR ─────────────────────────────────────
+// Difficulty tiers: 0-4 easy, 5-9 medium, 10-14 hard, 15+ expert
 function generateEndlessLevel(score){
-  const diff=Math.min(score/5,5);
-  const colors=[{color:'#4060ff',color2:'#8090ff'},{color:'#ff6040',color2:'#ff9080'},{color:'#40ff80',color2:'#80ffc0'},{color:'#ff40a0',color2:'#ff80c0'},{color:'#40a0ff',color2:'#80c0ff'},{color:'#a040ff',color2:'#d080ff'}];
-  const planets=Array.from({length:2+Math.floor(diff/2)},(_,i)=>{
+  const diff=Math.min(score/4,8); // faster difficulty ramp
+  const tier=score<5?0:score<10?1:score<15?2:3; // 0=easy,1=med,2=hard,3=expert
+  const colors=[
+    {color:'#4060ff',color2:'#8090ff'},{color:'#ff6040',color2:'#ff9080'},
+    {color:'#40ff80',color2:'#80ffc0'},{color:'#ff40a0',color2:'#ff80c0'},
+    {color:'#40a0ff',color2:'#80c0ff'},{color:'#a040ff',color2:'#d080ff'},
+    {color:'#ffcc00',color2:'#ffe080'},{color:'#00ffcc',color2:'#80ffe0'},
+  ];
+  const nPlanets=2+Math.floor(diff/2.5);
+  const planets=Array.from({length:Math.min(nPlanets,5)},(_,i)=>{
     const c=colors[i%colors.length];
-    return{x:rand(80,310),y:rand(250,600),radius:rand(24,42),gravity:rand(130,220),color:c.color,color2:c.color2,reverse:diff>3&&Math.random()<.3,ringColor:Math.random()<.35?'rgba(100,200,255,0.35)':null};
+    const isBlackHole=tier>=3&&i===0&&Math.random()<.35;
+    return{
+      x:rand(80,310),y:rand(240,600),
+      radius:isBlackHole?20:rand(22,40),
+      gravity:isBlackHole?rand(300,400):rand(130,240),
+      color:isBlackHole?'#0a0a20':c.color,
+      color2:isBlackHole?'#2020a0':c.color2,
+      reverse:tier>=2&&!isBlackHole&&Math.random()<.28,
+      ringColor:Math.random()<.3?'rgba(100,200,255,0.35)':null
+    };
   });
-  const level={ballX:rand(60,330),ballY:rand(680,760),targetX:rand(60,330),targetY:rand(100,200),targetRadius:22,
-               planets,stars:[{x:rand(60,330),y:rand(150,680)},{x:rand(60,330),y:rand(150,680)},{x:rand(60,330),y:rand(150,680)}],portals:[],boosters:[],walls:[]};
-  if(diff>1.5&&Math.random()<.5)level.boosters.push({x:rand(100,290),y:rand(500,700),angle:-Math.PI/2+rand(-.8,.8),strength:240,color:'#ffcc00'});
-  if(diff>3&&Math.random()<.4)level.portals.push({ax:rand(80,160),ay:rand(200,400),bx:rand(220,310),by:rand(500,700),color:'#00ffcc'});
+
+  const level={
+    ballX:rand(50,340),ballY:rand(660,770),
+    targetX:rand(50,340),targetY:rand(90,210),
+    targetRadius:22,planets,
+    stars:[{x:rand(60,330),y:rand(150,660)},{x:rand(60,330),y:rand(150,660)},{x:rand(60,330),y:rand(150,660)}],
+    portals:[],boosters:[],walls:[]
+  };
+
+  // Boosters appear at tier 1+
+  if(tier>=1&&Math.random()<.55)
+    level.boosters.push({x:rand(100,290),y:rand(480,700),angle:-Math.PI/2+rand(-.9,.9),strength:rand(220,280),color:'#ffcc00'});
+  if(tier>=2&&Math.random()<.35)
+    level.boosters.push({x:rand(100,290),y:rand(480,700),angle:-Math.PI/2+rand(-.9,.9),strength:rand(200,260),color:'#ff80cc'});
+
+  // Portals appear at tier 1+
+  if(tier>=1&&Math.random()<.45)
+    level.portals.push({ax:rand(70,170),ay:rand(180,420),bx:rand(210,330),by:rand(480,720),color:'#00ffcc'});
+  if(tier>=3&&Math.random()<.35)
+    level.portals.push({ax:rand(50,150),ay:rand(300,550),bx:rand(240,340),by:rand(150,350),color:'#ff80ff'});
+
+  // Walls appear at tier 2+
+  if(tier>=2&&Math.random()<.5){
+    const wx=rand(150,280),wy=rand(350,580);
+    level.walls.push({x1:wx-rand(40,80),y1:wy-rand(20,50),x2:wx+rand(40,80),y2:wy+rand(20,50),color:'#40c0ff'});
+  }
+  if(tier>=3&&Math.random()<.4){
+    const wx=rand(80,200),wy=rand(200,400);
+    level.walls.push({x1:wx,y1:wy,x2:wx+rand(50,110),y2:wy+rand(30,80),color:'#80ff40'});
+  }
+
   return level;
 }
 
@@ -2082,18 +2397,34 @@ const GameState={
   currentLevelIndex:0,attempts:MAX_ATTEMPTS,starsCollected:0,
   playing:false,paused:false,endless:false,endlessScore:0,endlessBest:0,
   levelProgress:new Array(LEVELS.length).fill(0),
-  init(){this.levelProgress[0]=1;this.endlessBest=parseInt(localStorage.getItem('cosmo_best')||'0');},
+  init(){
+    // Load saved progress
+    try{
+      const saved=JSON.parse(localStorage.getItem('astro_progress')||'null');
+      if(saved&&Array.isArray(saved)){
+        for(let i=0;i<Math.min(saved.length,this.levelProgress.length);i++)
+          this.levelProgress[i]=saved[i];
+      }
+    }catch(e){}
+    this.levelProgress[0]=Math.max(this.levelProgress[0],1);
+    this.endlessBest=parseInt(localStorage.getItem('cosmo_best')||'0');
+    this._totalStars=0;
+    Achievements.init();
+  },
   startLevel(idx){
     this.currentLevelIndex=idx;this.attempts=MAX_ATTEMPTS;this.starsCollected=0;
     this.playing=true;this.paused=false;this.endless=false;
     PhysicsEngine.reset(LEVELS[idx]);
     // Hide all screens and bg canvas, show HUD
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-    const bg=document.getElementById('bgStarsCanvas');if(bg)bg.style.display='none';
     const igm=document.getElementById('inGameMenu');if(igm)igm.classList.remove('active');
     const hud=document.getElementById('hud');if(hud)hud.style.display='block';
     this.updateHUD();
     Music.playRandom();
+    // Show tutorial on first visit to level 1
+    if(idx===0&&Tutorial.shouldShow()){
+      setTimeout(()=>Tutorial.show(),800);
+    }
   },
   startEndlessMode(){
     this.endless=true;this.endlessScore=0;this.attempts=MAX_ATTEMPTS;this.starsCollected=0;
@@ -2123,9 +2454,15 @@ const GameState={
   },
   onLevelWin(){
     this.playing=false;const stars=this.starsCollected;
+    const attemptsUsed=MAX_ATTEMPTS-this.attempts+1; // shots fired this level
     setTimeout(()=>{
       if(this.endless){
-        this.endlessScore+=100+stars*50;this.attempts=MAX_ATTEMPTS;this.starsCollected=0;
+        this.endlessScore+=100+stars*50;
+        // Track cumulative stars for achievement
+        this._totalStars=(this._totalStars||0)+stars;
+        Achievements.onStarsCollected(this._totalStars);
+        Achievements.onLevelWin(-1,stars,attemptsUsed,true,this.endlessScore);
+        this.attempts=MAX_ATTEMPTS;this.starsCollected=0;
         PhysicsEngine.reset(generateEndlessLevel(this.endlessScore));this.playing=true;this.updateHUD();Particles.clear();
       }else{
         const idx=this.currentLevelIndex;
@@ -2133,6 +2470,12 @@ const GameState={
         this.levelProgress[idx]=Math.max(this.levelProgress[idx],stars+1);
         if(idx+1<LEVELS.length)this.levelProgress[idx+1]=Math.max(this.levelProgress[idx+1],1);
         const isLast=idx+1>=LEVELS.length;
+        // Save progress
+        localStorage.setItem('astro_progress',JSON.stringify(this.levelProgress));
+        // Cumulative stars
+        this._totalStars=(this._totalStars||0)+stars;
+        Achievements.onStarsCollected(this._totalStars);
+        Achievements.onLevelWin(idx,stars,attemptsUsed,false,0);
 
         const doTransition=()=>{
           LevelTransition.play(stars,pts,isLast,()=>{
@@ -2152,13 +2495,14 @@ const GameState={
     },600);
   },
   updateHUD(){
-    // Level label — bottom-left
+    // Dirty-check: skip DOM work when nothing changed
+    const key=`${this.endless?this.endlessScore:this.currentLevelIndex}|${this.attempts}`;
+    if(this._hudKey===key)return;
+    this._hudKey=key;
     const lvlEl=document.getElementById('hudLevelLabel');
     if(lvlEl) lvlEl.textContent=this.endless?`SCORE: ${this.endlessScore}`:`LEVEL ${this.currentLevelIndex+1}`;
-    // Attempts text — "SHOTS LEFT: X/5"
     const attText=document.getElementById('hudAttemptsText');
     if(attText) attText.textContent=`SHOTS LEFT: ${this.attempts}/${MAX_ATTEMPTS}`;
-    // Attempts dots
     const attEl=document.getElementById('attemptsRow');
     if(attEl){
       attEl.innerHTML='';
@@ -2185,10 +2529,6 @@ function showScreen(id){
   if(igm)igm.classList.remove('active');
   const sb=document.getElementById('hudShuffleBtn');
   if(sb){sb.classList.remove('visible');sb.classList.remove('used');}
-  // Show starfield bg on title, menu and level-select screens
-  const bg=document.getElementById('bgStarsCanvas');
-  const showBg=(id==='titleScreen'||id==='menuScreen'||id==='levelScreen');
-  if(bg)bg.style.display=showBg?'block':'none';
   if(id){
     const el=document.getElementById(id);
     if(el)el.classList.add('active');
@@ -2276,6 +2616,17 @@ const Game={
   showAbout(){
     const m=document.getElementById('aboutModal');
     if(m)m.classList.add('active');
+    // Populate achievements grid
+    const grid=document.getElementById('aboutAchGrid');
+    if(grid){
+      grid.innerHTML='';
+      Achievements.getAll().forEach(a=>{
+        const el=document.createElement('div');
+        el.className='ach-item'+(a.earned?' earned':' locked');
+        el.innerHTML=`<div class="ach-item-icon">${a.icon}</div><div class="ach-item-info"><div class="ach-item-name">${a.name}</div><div class="ach-item-desc">${a.desc}</div></div>`;
+        grid.appendChild(el);
+      });
+    }
   },
   closeAbout(){
     const m=document.getElementById('aboutModal');
@@ -2307,7 +2658,9 @@ const Game={
     const next=GameState.currentLevelIndex+1;
     if(next<LEVELS.length)GameState.startLevel(next);
     else{buildLevelGrid();showScreen('levelScreen');}
-  }
+  },
+
+  startEndless(){GameState.startEndlessMode();}
 };
 
 // Robust PLAY entry point — works with click, pointerup, touchend, and inline onclick
@@ -2350,44 +2703,62 @@ Game.startFirstLevel=function(event){
       life:1,maxLife:1,len:55+Math.random()*90});
   }
 
+  // Pre-bake static gradients (created once, reused every frame)
+  const _bgGrad=(()=>{
+    const g=c.createLinearGradient(0,0,0,BH);
+    g.addColorStop(0,'#04000e');g.addColorStop(.4,'#06001a');
+    g.addColorStop(.75,'#08002a');g.addColorStop(1,'#04000e');
+    return g;
+  })();
+  const _vigGrad=(()=>{
+    const g=c.createRadialGradient(BW/2,BH/2,BH*.18,BW/2,BH/2,BH*.78);
+    g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.48)');
+    return g;
+  })();
+  // Pre-bake static nebulae to an offscreen canvas (drawn once)
+  const _nebCv=document.createElement('canvas');
+  _nebCv.width=BW;_nebCv.height=BH;
+  const _nebC=_nebCv.getContext('2d');
+  NEBULAE.forEach(n=>{
+    const g=_nebC.createRadialGradient(n.x,n.y,0,n.x,n.y,Math.max(n.rx,n.ry));
+    g.addColorStop(0,`hsla(${n.hue},100%,55%,${n.a*1.6})`);
+    g.addColorStop(.5,`hsla(${n.hue},80%,40%,${n.a})`);
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    _nebC.save();_nebC.translate(n.x,n.y);
+    _nebC.scale(n.rx/Math.max(n.rx,n.ry),n.ry/Math.max(n.rx,n.ry));
+    _nebC.fillStyle=g;_nebC.beginPath();_nebC.arc(0,0,Math.max(n.rx,n.ry),0,Math.PI*2);_nebC.fill();
+    _nebC.restore();
+  });
+
   let bgT=0,bgLast=0;
 
   function bgFrame(ts){
     const dt=Math.min((ts-bgLast)*.001,.05);bgLast=ts;bgT+=dt;
-    // Only animate when the canvas is visible
-    const bg2=document.getElementById('bgStarsCanvas');
-    if(!bg2||bg2.style.display==='none'){requestAnimationFrame(bgFrame);return;}
-
     c.clearRect(0,0,BW,BH);
+    c.fillStyle=_bgGrad;c.fillRect(0,0,BW,BH);
+    c.drawImage(_nebCv,0,0);
 
-    // Deep space bg
-    const bg=c.createLinearGradient(0,0,0,BH);
-    bg.addColorStop(0,'#04000e');bg.addColorStop(.4,'#06001a');
-    bg.addColorStop(.75,'#08002a');bg.addColorStop(1,'#04000e');
-    c.fillStyle=bg;c.fillRect(0,0,BW,BH);
-
-    // Nebula blobs
-    NEBULAE.forEach(n=>{
-      const g=c.createRadialGradient(n.x,n.y,0,n.x,n.y,Math.max(n.rx,n.ry));
-      g.addColorStop(0,`hsla(${n.hue},100%,55%,${n.a*1.6})`);
-      g.addColorStop(.5,`hsla(${n.hue},80%,40%,${n.a})`);
-      g.addColorStop(1,'rgba(0,0,0,0)');
-      c.save();c.translate(n.x,n.y);
-      c.scale(n.rx/Math.max(n.rx,n.ry),n.ry/Math.max(n.rx,n.ry));
-      c.fillStyle=g;c.beginPath();c.arc(0,0,Math.max(n.rx,n.ry),0,Math.PI*2);c.fill();
-      c.restore();
+    // Pass 1: dim stars — no shadowBlur (cheap)
+    c.shadowBlur=0;
+    bgStars.forEach(s=>{
+      if(s.bright)return;
+      const pulse=.35+.65*Math.abs(Math.sin(bgT*s.speed+s.phase));
+      c.globalAlpha=pulse*.78;
+      c.fillStyle=`hsl(${s.hue},100%,88%)`;
+      c.beginPath();c.arc(s.x,s.y,s.r*pulse,0,Math.PI*2);c.fill();
     });
 
-    // Neon stars
+    // Pass 2: bright stars — with shadowBlur (~15% of stars)
     bgStars.forEach(s=>{
+      if(!s.bright)return;
       const pulse=.35+.65*Math.abs(Math.sin(bgT*s.speed+s.phase));
-      const alpha=s.bright?Math.min(pulse*1.4,1):pulse*.78;
+      const alpha=Math.min(pulse*1.4,1);
       c.globalAlpha=alpha;
       c.fillStyle=`hsl(${s.hue},100%,88%)`;
       c.shadowColor=`hsl(${s.hue},100%,70%)`;
-      c.shadowBlur=s.bright?pulse*14:pulse*5;
-      c.beginPath();c.arc(s.x,s.y,s.r*(s.bright?1.5:1)*pulse,0,Math.PI*2);c.fill();
-      if(s.bright&&pulse>.7){
+      c.shadowBlur=pulse*14;
+      c.beginPath();c.arc(s.x,s.y,s.r*1.5*pulse,0,Math.PI*2);c.fill();
+      if(pulse>.7){
         c.strokeStyle=`hsla(${s.hue},100%,90%,${alpha*.5})`;c.lineWidth=.7;
         const fl=s.r*5*pulse;
         c.beginPath();c.moveTo(s.x-fl,s.y);c.lineTo(s.x+fl,s.y);c.stroke();
@@ -2412,15 +2783,21 @@ Game.startFirstLevel=function(event){
       c.beginPath();c.moveTo(tx,ty);c.lineTo(s.x,s.y);c.stroke();c.shadowBlur=0;
     }
 
-    // Vignette
-    const vig=c.createRadialGradient(BW/2,BH/2,BH*.18,BW/2,BH/2,BH*.78);
-    vig.addColorStop(0,'rgba(0,0,0,0)');vig.addColorStop(1,'rgba(0,0,0,.48)');
-    c.fillStyle=vig;c.fillRect(0,0,BW,BH);
-
+    c.fillStyle=_vigGrad;c.fillRect(0,0,BW,BH);
     requestAnimationFrame(bgFrame);
   }
   requestAnimationFrame(ts=>{bgLast=ts;requestAnimationFrame(bgFrame);});
 })();
+
+// ── SCALE BG STARS CANVAS TO FILL VIEWPORT ───────────────
+function scaleBgCanvas(){
+  const bg=document.getElementById('bgStarsCanvas');
+  if(!bg)return;
+  const s=Math.max(window.innerWidth/390,window.innerHeight/844)*1.05;
+  bg.style.transform=`translate(-50%,-50%) scale(${s})`;
+}
+scaleBgCanvas();
+window.addEventListener('resize',scaleBgCanvas);
 
 // ── TITLE ANIMATION — Neon Glow: Ship Orbiting Planet ────
 (()=>{
@@ -2660,6 +3037,8 @@ window.Music=Music;
 window.Audio=Audio;
 window.ATT=ATT;
 window.AdManager=AdManager;
+window.Achievements=Achievements;
+window.Tutorial=Tutorial;
 
 // ── Bind all important UI buttons via addEventListener ──
 function initUIBindings(){

@@ -694,7 +694,7 @@
     <div style="color:rgba(255,255,255,.38);font-size:12px;letter-spacing:3px;margin:10px 0 20px">NO SHOTS LEFT</div>
     <button class="btn btn-orange" onclick="Game.restartFromLevel1()">TRY AGAIN</button>
     <div style="height:8px"></div>
-    <button class="btn btn-ghost btn-sm" onclick="Game.showLevelSelect()">LEVELS</button>
+    <button class="btn btn-ghost btn-sm" onclick="Game.goToMainMenu()">BACK TO MENU</button>
   </div>
 
   <!-- ENDLESS RESULT -->
@@ -1236,6 +1236,47 @@ const Shake={x:0,y:0,t:0,intensity:0,
   update(dt){if(this.t>0){this.t-=dt;const f=Math.max(0,this.t);this.x=rand(-1,1)*this.intensity*f;this.y=rand(-1,1)*this.intensity*f;}else{this.x=0;this.y=0;}}
 };
 
+const LaunchTimer={
+  TIME:10,remaining:10,_running:false,_pulse:0,
+  reset(){this.remaining=this.TIME;this._running=false;this._pulse=0;},
+  startCountdown(){this.remaining=this.TIME;this._running=true;this._pulse=0;},
+  update(dt){
+    if(!this._running||Slingshot.launched)return;
+    this._pulse+=dt;
+    this.remaining-=dt;
+    if(this.remaining<=0){
+      this.remaining=0;this._running=false;
+      this.reset();
+      GameState.onMiss();
+    }
+  },
+  draw(ctx){
+    if(!this._running||Slingshot.launched||!GameState.playing||GameState.paused)return;
+    const ball=PhysicsEngine.ball;
+    if(!ball)return;
+    const x=ball.x,y=ball.y-52;
+    const frac=this.remaining/this.TIME;
+    const col=this.remaining>5?'#40ff80':this.remaining>3?'#ffcc00':'#ff4020';
+    ctx.save();
+    // bg ring
+    ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(x,y,16,0,Math.PI*2);ctx.stroke();
+    // countdown arc
+    ctx.strokeStyle=col;ctx.lineWidth=3;
+    ctx.shadowColor=col;ctx.shadowBlur=8;ctx.lineCap='round';
+    ctx.beginPath();ctx.arc(x,y,16,-Math.PI/2,-Math.PI/2+frac*Math.PI*2);ctx.stroke();
+    ctx.shadowBlur=0;
+    // number
+    const pulse=1+.06*Math.sin(this._pulse*8);
+    ctx.font=`bold ${Math.round(13*pulse)}px 'Fredoka One',sans-serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=6;
+    ctx.fillText(Math.ceil(this.remaining),x,y);
+    ctx.shadowBlur=0;
+    ctx.restore();
+  }
+};
+
 // ── BACKGROUND ───────────────────────────────────────────
 const Background={
   layers:[],nebulas:[],t:0,
@@ -1511,53 +1552,118 @@ class Star{
   }
 }
 
-// ── TARGET ───────────────────────────────────────────────
+// ── TARGET — WORMHOLE ────────────────────────────────────
 class Target{
-  constructor(x,y,radius=20){this.x=x;this.y=y;this.radius=radius;this.t=0;this.hit=false;this.hitAnim=0;this.bT=0;}
-  update(dt){this.t+=dt*2;this.bT+=dt;if(this.hit)this.hitAnim+=dt*3;}
+  constructor(x,y,radius=22){
+    this.x=x;this.y=y;this.radius=radius;
+    this.t=0;this.bT=0;this.hit=false;this.hitAnim=0;
+  }
+  update(dt){
+    this.t+=dt;this.bT+=dt;
+    if(this.hit)this.hitAnim+=dt*2.2;
+  }
   draw(ctx,ballX,ballY){
-    if(this.hit&&this.hitAnim>1.2)return;
+    if(this.hit&&this.hitAnim>1.5)return;
     const x=this.x,y=this.y,r=this.radius;
     ctx.save();
-    if(this.hit){ctx.globalAlpha=Math.max(0,1-this.hitAnim*.9);ctx.translate(x,y);ctx.scale(1+this.hitAnim*2.5,1+this.hitAnim*2.5);ctx.translate(-x,-y);}
-    if(!this.hit){
-      const b1=(this.bT%1.15)/1.15;
-      if(b1<.85){ctx.globalAlpha=(1-b1/.85)*.3;ctx.strokeStyle='#ff2828';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,r+10+b1*40,0,Math.PI*2);ctx.stroke();}
-      const b2=((this.bT+.57)%1.15)/1.15;
-      if(b2<.85){ctx.globalAlpha=(1-b2/.85)*.18;ctx.strokeStyle='#ff6060';ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(x,y,r+6+b2*28,0,Math.PI*2);ctx.stroke();}
-      ctx.globalAlpha=1;
-      if(ballX!==undefined){
-        const dx=x-ballX,dy=y-ballY,d=Math.hypot(dx,dy);
-        if(d>r*3.5){
-          const nx=dx/d,ny=dy/d,ax=x-nx*r*2,ay=y-ny*r*2;
-          ctx.globalAlpha=.28+.14*Math.sin(this.bT*3);ctx.fillStyle='#ff4848';
-          ctx.save();ctx.translate(ax,ay);ctx.rotate(Math.atan2(dy,dx)+Math.PI);
-          ctx.beginPath();ctx.moveTo(0,-4.5);ctx.lineTo(7,0);ctx.lineTo(0,4.5);ctx.closePath();ctx.fill();ctx.restore();
-        }
-        ctx.globalAlpha=1;
-      }
+
+    // Hit animation: expand outward + fade (wormhole "opens")
+    if(this.hit){
+      ctx.globalAlpha=Math.max(0,1-this.hitAnim*.7);
+      ctx.translate(x,y);ctx.scale(1+this.hitAnim*3,1+this.hitAnim*3);ctx.translate(-x,-y);
     }
-    const gg=ctx.createRadialGradient(x,y,0,x,y,r*2.3);
-    gg.addColorStop(0,'rgba(255,25,25,0.2)');gg.addColorStop(1,'rgba(255,0,0,0)');
-    ctx.fillStyle=gg;ctx.beginPath();ctx.arc(x,y,r*2.3,0,Math.PI*2);ctx.fill();
-    const bAlpha=this.hit?1:.48+.44*Math.sin(this.t);
-    ctx.strokeStyle=`rgba(255,70,70,${bAlpha})`;ctx.lineWidth=2;ctx.shadowColor='#ff1a1a';ctx.shadowBlur=12;
-    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();
-    ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1.4;ctx.shadowBlur=5;
-    ctx.beginPath();ctx.arc(x,y,r*.65,0,Math.PI*2);ctx.stroke();
-    ctx.fillStyle='#ff1a1a';ctx.shadowColor='#ff3030';ctx.shadowBlur=18;
-    ctx.beginPath();ctx.arc(x,y,r*.3,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='rgba(255,255,255,0.68)';ctx.lineWidth=1.4;ctx.shadowBlur=4;
-    const g=r*.36;
-    ctx.beginPath();ctx.moveTo(x-r*1.1,y);ctx.lineTo(x-g,y);ctx.moveTo(x+g,y);ctx.lineTo(x+r*1.1,y);
-    ctx.moveTo(x,y-r*1.1);ctx.lineTo(x,y-g);ctx.moveTo(x,y+g);ctx.lineTo(x,y+r*1.1);ctx.stroke();
+
+    // Outer ambient glow
+    const outerGlow=ctx.createRadialGradient(x,y,r,x,y,r*3.8);
+    outerGlow.addColorStop(0,'rgba(80,20,255,0.18)');
+    outerGlow.addColorStop(.5,'rgba(0,180,255,0.07)');
+    outerGlow.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=outerGlow;ctx.beginPath();ctx.arc(x,y,r*3.8,0,Math.PI*2);ctx.fill();
+
+    // Pulsing gravity-wave rings (like current target's sonar, but cyan/violet)
+    if(!this.hit){
+      const w1=(this.bT%1.3)/1.3;
+      if(w1<.85){ctx.globalAlpha=(1-w1/.85)*.22;ctx.strokeStyle='#6020ff';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,r+8+w1*48,0,Math.PI*2);ctx.stroke();}
+      const w2=((this.bT+.65)%1.3)/1.3;
+      if(w2<.85){ctx.globalAlpha=(1-w2/.85)*.16;ctx.strokeStyle='#00ccff';ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(x,y,r+4+w2*32,0,Math.PI*2);ctx.stroke();}
+      ctx.globalAlpha=this.hit?Math.max(0,1-this.hitAnim*.7):1;
+    }
+
+    // Three spinning orbital rings at different speeds & angles
+    const orbits=[
+      {rM:2.1,spd:.5, col:'rgba(100,30,255,',  base:.38,lw:1.8,dash:[8,5]},
+      {rM:1.6,spd:.95,col:'rgba(0,200,255,',   base:.45,lw:1.4,dash:[5,4]},
+      {rM:1.2,spd:1.7,col:'rgba(180,100,255,', base:.52,lw:1.0,dash:[4,3]},
+    ];
+    orbits.forEach((o,i)=>{
+      const alpha=o.base+.14*Math.sin(this.t*o.spd*2+i);
+      ctx.save();ctx.translate(x,y);ctx.rotate(this.t*o.spd*(i%2?-1:1));
+      ctx.strokeStyle=o.col+alpha+')';ctx.lineWidth=o.lw;
+      ctx.shadowColor=o.col+'.9)';ctx.shadowBlur=10;
+      ctx.setLineDash(o.dash);ctx.beginPath();ctx.arc(0,0,r*o.rM,0,Math.PI*2);ctx.stroke();
+      ctx.setLineDash([]);ctx.restore();
+    });
+    ctx.shadowBlur=0;
+
+    // Galaxy spiral arms (3 arms, rotating)
+    ctx.save();ctx.translate(x,y);ctx.rotate(this.t*.55);
+    for(let arm=0;arm<3;arm++){
+      ctx.save();ctx.rotate(arm*Math.PI*2/3);
+      ctx.beginPath();
+      for(let i=0;i<38;i++){
+        const tt=i/37,rr=r*(.38+tt*1.55),a=tt*Math.PI*1.75;
+        const px=Math.cos(a)*rr,py=Math.sin(a)*rr;
+        i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+      }
+      const armA=.28+.1*Math.sin(this.t*1.8+arm);
+      ctx.strokeStyle=`rgba(130,50,255,${armA})`;ctx.lineWidth=1.8;
+      ctx.shadowColor='#7030ff';ctx.shadowBlur=7;ctx.stroke();
+      ctx.restore();
+    }
+    ctx.restore();ctx.shadowBlur=0;
+
+    // Dark event horizon (black center)
+    const dark=ctx.createRadialGradient(x,y,0,x,y,r*.92);
+    dark.addColorStop(0,'rgba(0,0,0,1)');
+    dark.addColorStop(.55,'rgba(4,0,18,0.97)');
+    dark.addColorStop(1,'rgba(16,0,40,0)');
+    ctx.fillStyle=dark;ctx.beginPath();ctx.arc(x,y,r*.92,0,Math.PI*2);ctx.fill();
+
+    // Inner accretion ring — bright glowing edge
+    const edgePulse=.65+.35*Math.sin(this.t*2.8);
+    ctx.strokeStyle=`rgba(100,210,255,${edgePulse})`;ctx.lineWidth=2.8;
+    ctx.shadowColor='#40d0ff';ctx.shadowBlur=22;
+    ctx.beginPath();ctx.arc(x,y,r*.82,0,Math.PI*2);ctx.stroke();
+
+    // Tiny bright core (distant star visible through wormhole)
+    const corePulse=.7+.3*Math.sin(this.t*3.5);
+    ctx.fillStyle=`rgba(220,240,255,${corePulse})`;ctx.shadowColor='#ffffff';ctx.shadowBlur=14;
+    ctx.beginPath();ctx.arc(x,y,r*.12,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+
+    // Directional arrow when ship is far away
+    if(!this.hit&&ballX!==undefined){
+      const dx=x-ballX,dy=y-ballY,d=Math.hypot(dx,dy);
+      if(d>r*4){
+        const nx=dx/d,ny=dy/d,ax=x-nx*r*2.6,ay=y-ny*r*2.6;
+        ctx.globalAlpha=.3+.15*Math.sin(this.bT*3);ctx.fillStyle='#80c0ff';
+        ctx.save();ctx.translate(ax,ay);ctx.rotate(Math.atan2(dy,dx)+Math.PI);
+        ctx.beginPath();ctx.moveTo(0,-4.5);ctx.lineTo(8,0);ctx.lineTo(0,4.5);ctx.closePath();ctx.fill();
+        ctx.restore();
+      }
+      ctx.globalAlpha=1;
+    }
+
     ctx.restore();
   }
   check(ball){
     if(this.hit)return false;
     if(dist(ball.x,ball.y,this.x,this.y)<this.radius+ball.radius){
-      this.hit=true;Audio.hit();Shake.trigger(10,.4);
-      Particles.spawn(this.x,this.y,'#ff2a2a',22,200);Particles.spawn(this.x,this.y,'#ff7030',15,155,'ring',40);Particles.spawn(this.x,this.y,'#ffffff',12,125);
+      this.hit=true;Audio.hit();Shake.trigger(4,.35);
+      Particles.spawn(this.x,this.y,'#00ffee',18,190);
+      Particles.spawn(this.x,this.y,'#8040ff',14,150,'ring',42);
+      Particles.spawn(this.x,this.y,'#ffffff',10,120);
+      Particles.spawn(this.x,this.y,'#4080ff',12,165);
       return true;
     }
     return false;
@@ -1968,7 +2074,7 @@ const Slingshot={
     if(power>.05){
       const speed=power*840,a=Math.atan2(dy,dx);
       PhysicsEngine.ball.launch(Math.cos(a)*speed,Math.sin(a)*speed);
-      this.launched=true;
+      this.launched=true;LaunchTimer.reset();
     }
   },
 
@@ -2421,6 +2527,7 @@ const GameState={
     const hud=document.getElementById('hud');if(hud)hud.style.display='block';
     this.updateHUD();
     Music.playRandom();
+    LaunchTimer.startCountdown();
     // Show tutorial on first visit to level 1
     if(idx===0&&Tutorial.shouldShow()){
       setTimeout(()=>Tutorial.show(),800);
@@ -2432,8 +2539,10 @@ const GameState={
     PhysicsEngine.reset(generateEndlessLevel(0));this.updateHUD();showScreen(null);
     document.getElementById('hud').style.display='block';
     Music.playRandom();
+    LaunchTimer.startCountdown();
   },
   onMiss(){
+    LaunchTimer.reset();
     this.attempts--;this.updateHUD();
     if(this.attempts<=0){
       this.playing=false;
@@ -2449,6 +2558,7 @@ const GameState={
       setTimeout(()=>{
         PhysicsEngine.ball.reset(PhysicsEngine.level.ballX,PhysicsEngine.level.ballY);
         Slingshot.launched=false;Particles.clear();
+        LaunchTimer.startCountdown();
       },450);
     }
   },
@@ -2463,7 +2573,7 @@ const GameState={
         Achievements.onStarsCollected(this._totalStars);
         Achievements.onLevelWin(-1,stars,attemptsUsed,true,this.endlessScore);
         this.attempts=MAX_ATTEMPTS;this.starsCollected=0;
-        PhysicsEngine.reset(generateEndlessLevel(this.endlessScore));this.playing=true;this.updateHUD();Particles.clear();
+        PhysicsEngine.reset(generateEndlessLevel(this.endlessScore));this.playing=true;this.updateHUD();Particles.clear();LaunchTimer.startCountdown();
       }else{
         const idx=this.currentLevelIndex;
         const pts=100+stars*50;
@@ -2560,11 +2670,12 @@ function gameLoop(ts){
   const dt=Math.min((ts-lastTime)/1000,.05);lastTime=ts;
   requestAnimationFrame(gameLoop);
   Background.update(dt);Shake.update(dt);Particles.update(dt);
-  if(GameState.playing&&!GameState.paused){PhysicsEngine.update(dt);GameState.updateHUD();}
+  if(GameState.playing&&!GameState.paused){PhysicsEngine.update(dt);LaunchTimer.update(dt);GameState.updateHUD();}
   ctx.save();ctx.translate(Shake.x,Shake.y);
   Background.draw(ctx);
   if(GameState.playing||GameState.paused)PhysicsEngine.draw(ctx);
   Particles.draw(ctx);
+  LaunchTimer.draw(ctx);
   ctx.restore();
 }
 
@@ -2579,7 +2690,7 @@ const Game={
   // ── In-game floating menu ──
   openInGameMenu(){
     if(!GameState.playing)return;
-    GameState.paused=true;
+    GameState.paused=true;LaunchTimer.reset();
     const m=document.getElementById('inGameMenu');
     if(m){
       document.getElementById('igmLevel').textContent=
@@ -2593,6 +2704,7 @@ const Game={
     if(m)m.classList.remove('active');
     document.getElementById('hud').style.display='block';
     Music.resume();
+    if(!Slingshot.launched)LaunchTimer.startCountdown();
   },
   restartCurrent(){
     const m=document.getElementById('inGameMenu');

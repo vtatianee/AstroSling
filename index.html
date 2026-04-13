@@ -277,7 +277,7 @@
   .lvlt-nextlabel.in{opacity:1;transform:translateY(0);}
 
   /* BUTTONS */
-  .btn{font-family:'Fredoka One',cursive;font-size:19px;padding:12px 36px;border-radius:50px;border:1px solid rgba(255,255,255,.09);cursor:pointer;transition:transform .1s,filter .1s;letter-spacing:1px;position:relative;overflow:hidden;}
+  .btn{font-family:'Fredoka One',cursive;font-size:19px;padding:12px 36px;border-radius:50px;border:1px solid rgba(255,255,255,.09);cursor:pointer;transition:transform .1s,filter .1s;letter-spacing:1px;position:relative;overflow:hidden;touch-action:manipulation;}
   .btn::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:rgba(255,255,255,.07);border-radius:50px 50px 0 0;pointer-events:none;}
   .btn:active{transform:translateY(2px) scale(.97);filter:brightness(.88);}
   .btn-primary{background:linear-gradient(160deg,#9030ff 0%,#5010bb 100%);color:#fff;box-shadow:0 4px 0 rgba(30,0,80,.7),0 8px 18px rgba(120,40,255,.28);}
@@ -2688,11 +2688,12 @@ let lastTime=0;
 function gameLoop(ts){
   const dt=Math.min((ts-lastTime)/1000,.05);lastTime=ts;
   requestAnimationFrame(gameLoop);
+  if(!GameState.playing||GameState.paused)return;
   Background.update(dt);Shake.update(dt);Particles.update(dt);
-  if(GameState.playing&&!GameState.paused){PhysicsEngine.update(dt);LaunchTimer.update(dt);GameState.updateHUD();}
+  PhysicsEngine.update(dt);LaunchTimer.update(dt);GameState.updateHUD();
   ctx.save();ctx.translate(Shake.x,Shake.y);
   Background.draw(ctx);
-  if(GameState.playing||GameState.paused)PhysicsEngine.draw(ctx);
+  PhysicsEngine.draw(ctx);
   Particles.draw(ctx);
   LaunchTimer.draw(ctx);
   ctx.restore();

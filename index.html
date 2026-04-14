@@ -277,7 +277,7 @@
   .lvlt-nextlabel.in{opacity:1;transform:translateY(0);}
 
   /* BUTTONS */
-  .btn{font-family:'Fredoka One',cursive;font-size:19px;padding:12px 36px;border-radius:50px;border:1px solid rgba(255,255,255,.09);cursor:pointer;transition:transform .1s,filter .1s;letter-spacing:1px;position:relative;overflow:hidden;}
+  .btn{font-family:'Fredoka One',cursive;font-size:19px;padding:12px 36px;border-radius:50px;border:1px solid rgba(255,255,255,.09);cursor:pointer;transition:transform .1s,filter .1s;letter-spacing:1px;position:relative;overflow:hidden;touch-action:manipulation;}
   .btn::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:rgba(255,255,255,.07);border-radius:50px 50px 0 0;pointer-events:none;}
   .btn:active{transform:translateY(2px) scale(.97);filter:brightness(.88);}
   .btn-primary{background:linear-gradient(160deg,#9030ff 0%,#5010bb 100%);color:#fff;box-shadow:0 4px 0 rgba(30,0,80,.7),0 8px 18px rgba(120,40,255,.28);}
@@ -1180,19 +1180,6 @@ class Particle{
     Object.assign(this,{x,y,vx,vy,color,life,maxLife:life,size,type});
   }
   update(dt){this.x+=this.vx*dt;this.y+=this.vy*dt;this.vy+=14*dt;this.life-=dt;this.vx*=.98;this.vy*=.98;}
-  draw(ctx){
-    const t=this.life/this.maxLife;
-    ctx.save();ctx.globalAlpha=t*.85;
-    if(this.type==='ring'){
-      ctx.strokeStyle=this.color;ctx.lineWidth=1.8;
-      ctx.beginPath();ctx.arc(this.x,this.y,(1-t)*this.size*2.2,0,Math.PI*2);ctx.stroke();
-    } else {
-      const s=this.size*t;
-      ctx.fillStyle=this.color;ctx.shadowColor=this.color;ctx.shadowBlur=5;
-      ctx.beginPath();ctx.arc(this.x,this.y,Math.max(.4,s),0,Math.PI*2);ctx.fill();
-    }
-    ctx.restore();
-  }
 }
 
 const Particles={
@@ -1226,8 +1213,31 @@ const Particles={
     if(this.list.length<200)this.list.push(new Particle(x,y,0,0,'#ff6030',.6,30,'ring'));
     if(this.list.length<200)this.list.push(new Particle(x,y,0,0,'#ffaa40',.4,20,'ring'));
   },
-  update(dt){this.list=this.list.filter(p=>{p.update(dt);return p.life>0;});},
-  draw(ctx){this.list.forEach(p=>p.draw(ctx));},
+  update(dt){
+    // Swap-and-pop: no array allocation per frame
+    let i=this.list.length;
+    while(i--){const p=this.list[i];p.update(dt);if(p.life<=0){this.list[i]=this.list[this.list.length-1];this.list.pop();}}
+  },
+  draw(ctx){
+    if(!this.list.length)return;
+    ctx.save();
+    // Dot particles — double-circle glow (no shadowBlur GPU cost)
+    this.list.forEach(p=>{
+      if(p.type==='ring')return;
+      const t=p.life/p.maxLife,s=Math.max(.4,p.size*t);
+      ctx.fillStyle=p.color;
+      ctx.globalAlpha=t*.22;ctx.beginPath();ctx.arc(p.x,p.y,s*2.6,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=t*.85;ctx.beginPath();ctx.arc(p.x,p.y,s,0,Math.PI*2);ctx.fill();
+    });
+    // Ring particles
+    this.list.forEach(p=>{
+      if(p.type!=='ring')return;
+      const t=p.life/p.maxLife;
+      ctx.globalAlpha=t*.85;ctx.strokeStyle=p.color;ctx.lineWidth=1.8;
+      ctx.beginPath();ctx.arc(p.x,p.y,(1-t)*p.size*2.2,0,Math.PI*2);ctx.stroke();
+    });
+    ctx.globalAlpha=1;ctx.restore();
+  },
   clear(){this.list=[];}
 };
 
@@ -1360,12 +1370,14 @@ class Planet{
     const x=this.x,y=this.y,r=this.radius*(1+.015*Math.sin(this.t*2)),rev=this.reverse;
     const gravR=this.gravRange;
     
-    // Gravity field zone
-    const fGrad=ctx.createRadialGradient(x,y,r*1.05,x,y,gravR);
-    fGrad.addColorStop(0,rev?'rgba(255,55,55,0.07)':'rgba(75,55,200,0.07)');
-    fGrad.addColorStop(.65,rev?'rgba(255,40,40,0.025)':'rgba(55,40,175,0.025)');
-    fGrad.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=fGrad;ctx.beginPath();ctx.arc(x,y,gravR,0,Math.PI*2);ctx.fill();
+    // Gravity field zone — gradient cached on first draw (position/range never change)
+    if(!this._fGrad){
+      this._fGrad=ctx.createRadialGradient(x,y,this.radius*1.05,x,y,gravR);
+      this._fGrad.addColorStop(0,rev?'rgba(255,55,55,0.07)':'rgba(75,55,200,0.07)');
+      this._fGrad.addColorStop(.65,rev?'rgba(255,40,40,0.025)':'rgba(55,40,175,0.025)');
+      this._fGrad.addColorStop(1,'rgba(0,0,0,0)');
+    }
+    ctx.fillStyle=this._fGrad;ctx.beginPath();ctx.arc(x,y,gravR,0,Math.PI*2);ctx.fill();
     
     // Dashed orbit rings with animated directional arrows
     const ringRatios=[.43,.67,.9];
@@ -1557,6 +1569,15 @@ class Target{
   constructor(x,y,radius=22){
     this.x=x;this.y=y;this.radius=radius;
     this.t=0;this.bT=0;this.hit=false;this.hitAnim=0;
+    // Pre-compute spiral arm geometry (saves 114 trig calls/frame)
+    this._sp=[];
+    for(let i=0;i<38;i++){const tt=i/37,a=tt*Math.PI*1.75;this._sp.push(tt,Math.cos(a),Math.sin(a));}
+    // Cache orbit ring definitions (avoid recreating array each frame)
+    this._orbits=[
+      {rM:2.1,spd:.5, col:'rgba(100,30,255,',  base:.38,lw:1.8,dash:[8,5]},
+      {rM:1.6,spd:.95,col:'rgba(0,200,255,',   base:.45,lw:1.4,dash:[5,4]},
+      {rM:1.2,spd:1.7,col:'rgba(180,100,255,', base:.52,lw:1.0,dash:[4,3]},
+    ];
   }
   update(dt){
     this.t+=dt;this.bT+=dt;
@@ -1590,12 +1611,7 @@ class Target{
     }
 
     // Three spinning orbital rings at different speeds & angles
-    const orbits=[
-      {rM:2.1,spd:.5, col:'rgba(100,30,255,',  base:.38,lw:1.8,dash:[8,5]},
-      {rM:1.6,spd:.95,col:'rgba(0,200,255,',   base:.45,lw:1.4,dash:[5,4]},
-      {rM:1.2,spd:1.7,col:'rgba(180,100,255,', base:.52,lw:1.0,dash:[4,3]},
-    ];
-    orbits.forEach((o,i)=>{
+    this._orbits.forEach((o,i)=>{
       const alpha=o.base+.14*Math.sin(this.t*o.spd*2+i);
       ctx.save();ctx.translate(x,y);ctx.rotate(this.t*o.spd*(i%2?-1:1));
       ctx.strokeStyle=o.col+alpha+')';ctx.lineWidth=o.lw;
@@ -1605,15 +1621,15 @@ class Target{
     });
     ctx.shadowBlur=0;
 
-    // Galaxy spiral arms (3 arms, rotating)
+    // Galaxy spiral arms (3 arms, rotating) — points pre-computed in constructor
     ctx.save();ctx.translate(x,y);ctx.rotate(this.t*.55);
     for(let arm=0;arm<3;arm++){
       ctx.save();ctx.rotate(arm*Math.PI*2/3);
       ctx.beginPath();
-      for(let i=0;i<38;i++){
-        const tt=i/37,rr=r*(.38+tt*1.55),a=tt*Math.PI*1.75;
-        const px=Math.cos(a)*rr,py=Math.sin(a)*rr;
-        i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+      for(let j=0;j<38;j++){
+        const k=j*3,rr=r*(.38+this._sp[k]*1.55);
+        const px=this._sp[k+1]*rr,py=this._sp[k+2]*rr;
+        j===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
       }
       const armA=.28+.1*Math.sin(this.t*1.8+arm);
       ctx.strokeStyle=`rgba(130,50,255,${armA})`;ctx.lineWidth=1.8;
@@ -2609,19 +2625,22 @@ const GameState={
     const key=`${this.endless?this.endlessScore:this.currentLevelIndex}|${this.attempts}`;
     if(this._hudKey===key)return;
     this._hudKey=key;
-    const lvlEl=document.getElementById('hudLevelLabel');
-    if(lvlEl) lvlEl.textContent=this.endless?`SCORE: ${this.endlessScore}`:`LEVEL ${this.currentLevelIndex+1}`;
-    const attText=document.getElementById('hudAttemptsText');
-    if(attText) attText.textContent=`SHOTS LEFT: ${this.attempts}/${MAX_ATTEMPTS}`;
-    const attEl=document.getElementById('attemptsRow');
-    if(attEl){
-      attEl.innerHTML='';
-      for(let i=0;i<MAX_ATTEMPTS;i++){
-        const d=document.createElement('div');
-        d.className='attempt-dot'+(i>=this.attempts?' used':'');
-        attEl.appendChild(d);
+    // Lazy-cache DOM refs and pre-build dot elements on first call
+    if(!this._hLvl){
+      this._hLvl=document.getElementById('hudLevelLabel');
+      this._hTxt=document.getElementById('hudAttemptsText');
+      const row=document.getElementById('attemptsRow');
+      if(row){
+        row.innerHTML='';this._hDots=[];
+        for(let i=0;i<MAX_ATTEMPTS;i++){
+          const d=document.createElement('div');d.className='attempt-dot';
+          row.appendChild(d);this._hDots.push(d);
+        }
       }
     }
+    if(this._hLvl) this._hLvl.textContent=this.endless?`SCORE: ${this.endlessScore}`:`LEVEL ${this.currentLevelIndex+1}`;
+    if(this._hTxt) this._hTxt.textContent=`SHOTS LEFT: ${this.attempts}/${MAX_ATTEMPTS}`;
+    if(this._hDots) this._hDots.forEach((d,i)=>{d.className='attempt-dot'+(i>=this.attempts?' used':'');});
   },
   pause() {if(!this.playing)return;this.paused=true;const m=document.getElementById('inGameMenu');if(m){document.getElementById('igmLevel').textContent=`LEVEL ${this.currentLevelIndex+1}`;m.classList.add('active');}},
   resume(){this.paused=false;const m=document.getElementById('inGameMenu');if(m)m.classList.remove('active');document.getElementById('hud').style.display='block';},
@@ -2669,11 +2688,12 @@ let lastTime=0;
 function gameLoop(ts){
   const dt=Math.min((ts-lastTime)/1000,.05);lastTime=ts;
   requestAnimationFrame(gameLoop);
+  if(!GameState.playing||GameState.paused)return;
   Background.update(dt);Shake.update(dt);Particles.update(dt);
-  if(GameState.playing&&!GameState.paused){PhysicsEngine.update(dt);LaunchTimer.update(dt);GameState.updateHUD();}
+  PhysicsEngine.update(dt);LaunchTimer.update(dt);GameState.updateHUD();
   ctx.save();ctx.translate(Shake.x,Shake.y);
   Background.draw(ctx);
-  if(GameState.playing||GameState.paused)PhysicsEngine.draw(ctx);
+  PhysicsEngine.draw(ctx);
   Particles.draw(ctx);
   LaunchTimer.draw(ctx);
   ctx.restore();

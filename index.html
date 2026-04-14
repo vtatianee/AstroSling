@@ -456,6 +456,18 @@
   .about-section p,.about-section a{font-size:13px;color:rgba(220,215,240,.65);line-height:1.65;display:block;margin-bottom:4px;}
   .about-section a{color:rgba(120,190,255,.8);text-decoration:none;}
   .about-section a:hover{text-decoration:underline;}
+  /* ACHIEVEMENTS MODAL */
+  #achievementsModal{position:absolute;inset:0;z-index:500;background:rgba(2,0,12,.88);backdrop-filter:blur(20px);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0 0 32px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .28s;}
+  #achievementsModal.active{opacity:1;pointer-events:all;}
+  .ach-modal-count{font-family:'Fredoka One',cursive;font-size:13px;color:rgba(200,180,255,.65);letter-spacing:1px;}
+  #achModalBody{width:100%;max-width:360px;padding:16px 16px 0;display:flex;flex-direction:column;gap:6px;}
+  .ach-section-lbl{font-family:'Fredoka One',cursive;font-size:10px;color:rgba(140,170,255,.55);letter-spacing:3px;text-transform:uppercase;padding:10px 4px 4px;}
+  .ach-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:10px 14px;}
+  .ach-row.earned{border-color:rgba(120,80,255,.3);background:rgba(80,40,200,.1);}
+  .ach-row.locked{opacity:.28;filter:grayscale(.7);}
+  .ach-row-icon{font-size:22px;width:30px;text-align:center;flex-shrink:0;}
+  .ach-row-name{font-family:'Fredoka One',cursive;font-size:13px;color:#fff;letter-spacing:.4px;}
+  .ach-row-desc{font-size:11px;color:rgba(200,190,230,.52);margin-top:1px;}
   .about-app-icon{width:64px;height:64px;border-radius:16px;
     background:linear-gradient(135deg,#3010a0,#6030ff);
     display:flex;align-items:center;justify-content:center;font-size:32px;
@@ -479,6 +491,8 @@
     <button type="button" class="btn btn-primary" id="titlePlayBtn" style="min-width:200px;position:relative;z-index:30;pointer-events:all;" onclick="return Game.startFirstLevel(event)">▶ PLAY</button>
     <div style="height:8px"></div>
     <button class="btn btn-ghost btn-sm" id="titleSelectBtn" style="min-width:200px">SELECT LEVEL</button>
+    <div style="height:8px"></div>
+    <button class="btn btn-ghost btn-sm" style="min-width:200px" onclick="Game.showAchievements()">🏆 ACHIEVEMENTS</button>
     <div style="height:10px"></div>
     <button class="btn btn-gold btn-sm" id="titleRemoveAdsBtn" style="min-width:200px" onclick="Game.showRemoveAds()">⭐ REMOVE ADS — $2.99</button>
     <div style="height:10px"></div>
@@ -637,6 +651,16 @@
         <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" target="_blank" style="margin-top:4px">Terms of Use (EULA) ↗</a>
       </div>
     </div>
+  </div>
+
+  <!-- ACHIEVEMENTS MODAL -->
+  <div id="achievementsModal">
+    <div class="about-header">
+      <h2>🏆 Achievements</h2>
+      <span class="ach-modal-count" id="achModalCount">0/36</span>
+      <button class="about-close" onclick="Game.closeAchievements()">✕</button>
+    </div>
+    <div id="achModalBody"></div>
   </div>
 
   <!-- LEVEL TRANSITION OVERLAY (CSS-only, guaranteed to work) -->
@@ -1050,6 +1074,32 @@ const ACHIEVEMENT_DEFS=[
   {id:'endless_drifter',icon:'♾️',name:'Endless Drifter',  desc:'Score 500+ in endless mode'},
   {id:'galaxy_explorer',icon:'🔭',name:'Galaxy Explorer',  desc:'Complete all 10 original levels'},
   {id:'master_sling',  icon:'🏆', name:'Master Sling',     desc:'Complete all 25 levels'},
+  // Per-level achievements (level field = 0-based index)
+  {id:'lvl_01',icon:'🌟',name:'Star Rookie',  desc:'3 stars · level 1',  level:0,  req:'stars3'},
+  {id:'lvl_02',icon:'🪐',name:'Orbit Pro',    desc:'3 stars · level 2',  level:1,  req:'stars3'},
+  {id:'lvl_03',icon:'🎯',name:'Precise',      desc:'1 shot · level 3',   level:2,  req:'shot1'},
+  {id:'lvl_04',icon:'🚀',name:'Booster Ace',  desc:'1 shot · level 4',   level:3,  req:'shot1'},
+  {id:'lvl_05',icon:'💫',name:'Full Boost',   desc:'3 stars · level 5',  level:4,  req:'stars3'},
+  {id:'lvl_06',icon:'🪞',name:'Wall Ace',     desc:'1 shot · level 6',   level:5,  req:'shot1'},
+  {id:'lvl_07',icon:'🔵',name:'Mirror Shot',  desc:'3 stars · level 7',  level:6,  req:'stars3'},
+  {id:'lvl_08',icon:'🌀',name:'Portal Ace',   desc:'1 shot · level 8',   level:7,  req:'shot1'},
+  {id:'lvl_09',icon:'✨',name:'Dimension',    desc:'3 stars · level 9',  level:8,  req:'stars3'},
+  {id:'lvl_10',icon:'🔄',name:'Anti-Gravity', desc:'beat level 10',       level:9,  req:'any'},
+  {id:'lvl_11',icon:'🌌',name:'Three Body',   desc:'3 stars · level 11', level:10, req:'stars3'},
+  {id:'lvl_12',icon:'💍',name:'Ring World',   desc:'1 shot · level 12',  level:11, req:'shot1'},
+  {id:'lvl_13',icon:'⚖️',name:'Quad Pull',    desc:'3 stars · level 13', level:12, req:'stars3'},
+  {id:'lvl_14',icon:'⚡',name:'Swiss Shot',   desc:'1 shot · level 14',  level:13, req:'shot1'},
+  {id:'lvl_15',icon:'🛸',name:'All Tools',    desc:'3 stars · level 15', level:14, req:'stars3'},
+  {id:'lvl_16',icon:'🎰',name:'Trifecta',     desc:'1 shot · level 16',  level:15, req:'shot1'},
+  {id:'lvl_17',icon:'🧱',name:'Maze Solver',  desc:'3 stars · level 17', level:16, req:'stars3'},
+  {id:'lvl_18',icon:'🎯',name:'Wall Wizard',  desc:'1 shot · level 18',  level:17, req:'shot1'},
+  {id:'lvl_19',icon:'🏛️',name:'Labyrinth',    desc:'3 stars · level 19', level:18, req:'stars3'},
+  {id:'lvl_20',icon:'⚫',name:'Hole in One',  desc:'1 shot · level 20',  level:19, req:'shot1'},
+  {id:'lvl_21',icon:'🌑',name:'Twin Holes',   desc:'3 stars · level 21', level:20, req:'stars3'},
+  {id:'lvl_22',icon:'🌀',name:'Chaos Pilot',  desc:'beat level 22',       level:21, req:'any'},
+  {id:'lvl_23',icon:'🚀',name:'Frontier Ace', desc:'1 shot · level 23',  level:22, req:'shot1'},
+  {id:'lvl_24',icon:'🌟',name:'Almost...',    desc:'3 stars · level 24', level:23, req:'stars3'},
+  {id:'lvl_25',icon:'👑',name:'Galaxy Legend',desc:'beat level 25',       level:24, req:'any'},
 ];
 
 const Achievements=(()=>{
@@ -1105,6 +1155,12 @@ const Achievements=(()=>{
         // All 25 levels
         if(levelIdx===24){
           if(GameState.levelProgress.every(p=>p>=1)) _unlock('master_sling');
+        }
+        // Per-level achievement
+        const lvlAch=ACHIEVEMENT_DEFS.find(a=>a.level===levelIdx);
+        if(lvlAch){
+          const ok=lvlAch.req==='stars3'?stars>=3:lvlAch.req==='shot1'?attemptsUsed===1:true;
+          if(ok)_unlock(lvlAch.id);
         }
       }
       // Endless mode score milestone
@@ -2763,6 +2819,41 @@ const Game={
   },
   closeAbout(){
     const m=document.getElementById('aboutModal');
+    if(m)m.classList.remove('active');
+  },
+
+  showAchievements(){
+    const modal=document.getElementById('achievementsModal');
+    if(!modal)return;
+    const all=Achievements.getAll();
+    const earned=all.filter(a=>a.earned).length;
+    document.getElementById('achModalCount').textContent=`${earned}/${all.length}`;
+    const body=document.getElementById('achModalBody');
+    body.innerHTML='';
+    // General challenges section
+    const general=all.filter(a=>a.level===undefined);
+    const lbl1=document.createElement('div');lbl1.className='ach-section-lbl';lbl1.textContent='Challenges';
+    body.appendChild(lbl1);
+    general.forEach(a=>{
+      const row=document.createElement('div');
+      row.className='ach-row '+(a.earned?'earned':'locked');
+      row.innerHTML=`<span class="ach-row-icon">${a.earned?a.icon:'🔒'}</span><div><div class="ach-row-name">${a.name}</div><div class="ach-row-desc">${a.desc}</div></div>`;
+      body.appendChild(row);
+    });
+    // Per-level section
+    const levels=all.filter(a=>a.level!==undefined).sort((a,b)=>a.level-b.level);
+    const lbl2=document.createElement('div');lbl2.className='ach-section-lbl';lbl2.textContent='Levels';
+    body.appendChild(lbl2);
+    levels.forEach(a=>{
+      const row=document.createElement('div');
+      row.className='ach-row '+(a.earned?'earned':'locked');
+      row.innerHTML=`<span class="ach-row-icon">${a.earned?a.icon:'🔒'}</span><div><div class="ach-row-name">${a.name}</div><div class="ach-row-desc">${a.desc}</div></div>`;
+      body.appendChild(row);
+    });
+    modal.classList.add('active');
+  },
+  closeAchievements(){
+    const m=document.getElementById('achievementsModal');
     if(m)m.classList.remove('active');
   },
 

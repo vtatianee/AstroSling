@@ -2663,6 +2663,7 @@ function showScreen(id){
     if(el)el.classList.add('active');
   }
   if(id==='titleScreen'||id==='menuScreen'||id==='levelScreen')Music.play(0);
+  ctx.clearRect(0,0,W,H);
 }
 
 function buildLevelGrid(){

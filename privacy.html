@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AstroSling – Privacy Policy</title>
+<style>
+  :root{
+    --bg:#04000e; --surface:#0d0022; --border:rgba(120,60,255,.2);
+    --text:#d8d0f0; --muted:#8070a8; --accent:#9060ff; --accent2:#60b0ff;
+    --white:#fff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 15%, rgba(80,20,180,.22) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 80%, rgba(20,60,200,.18) 0%, transparent 50%);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+    line-height:1.7;
+    min-height:100vh;
+  }
+  header{
+    background:rgba(10,0,30,.72);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);
+    padding:20px 0;
+    position:sticky;top:0;z-index:10;
+  }
+  .header-inner{
+    max-width:760px;margin:0 auto;padding:0 24px;
+    display:flex;align-items:center;gap:16px;
+  }
+  .app-icon{
+    width:52px;height:52px;border-radius:12px;
+    background:linear-gradient(135deg,#3010a0,#6030ff);
+    display:flex;align-items:center;justify-content:center;
+    font-size:28px;flex-shrink:0;
+    box-shadow:0 0 18px rgba(100,40,220,.5);
+  }
+  .header-text h1{
+    font-size:20px;font-weight:700;color:var(--white);letter-spacing:.4px;
+  }
+  .header-text p{font-size:13px;color:var(--muted);margin-top:1px;}
+
+  main{max-width:760px;margin:0 auto;padding:48px 24px 80px;}
+
+  .hero{
+    text-align:center;margin-bottom:52px;
+    padding:40px 32px;
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--border);
+    border-radius:20px;
+  }
+  .hero h2{
+    font-size:32px;font-weight:800;color:var(--white);
+    background:linear-gradient(135deg,#c080ff,#60b0ff);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:10px;
+  }
+  .hero p{color:var(--muted);font-size:15px;max-width:480px;margin:0 auto;}
+  .badge{
+    display:inline-block;margin-top:20px;
+    background:rgba(80,140,255,.12);border:1px solid rgba(80,140,255,.3);
+    color:#60b0ff;font-size:12px;font-weight:700;letter-spacing:1.5px;
+    padding:6px 16px;border-radius:50px;text-transform:uppercase;
+  }
+
+  section{margin-bottom:44px;}
+  h3{
+    font-size:18px;font-weight:700;color:var(--white);
+    margin-bottom:14px;padding-bottom:10px;
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:10px;
+  }
+  h3 .icon{font-size:20px;}
+  p{color:var(--text);font-size:15px;margin-bottom:12px;}
+  ul{padding-left:20px;margin-bottom:12px;}
+  li{margin-bottom:6px;color:var(--text);font-size:15px;}
+  strong{color:var(--white);}
+  a{color:var(--accent2);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  code{
+    background:rgba(255,255,255,.08);border-radius:4px;
+    padding:1px 6px;font-size:13px;font-family:monospace;color:var(--accent2);
+  }
+
+  .info-box{
+    background:rgba(255,255,255,.04);border:1px solid var(--border);
+    border-radius:12px;padding:20px 24px;margin-bottom:16px;
+  }
+  .info-box p:last-child{margin-bottom:0;}
+
+  .highlight-box{
+    background:rgba(144,96,255,.08);border:1px solid rgba(144,96,255,.25);
+    border-radius:12px;padding:20px 24px;margin-bottom:16px;
+  }
+  .highlight-box p:last-child{margin-bottom:0;}
+
+  .warning-box{
+    background:rgba(255,160,40,.06);border:1px solid rgba(255,160,40,.22);
+    border-radius:12px;padding:16px 24px;margin-bottom:16px;
+  }
+  .warning-box p{color:#e0b060;margin-bottom:0;font-size:14px;}
+
+  table{
+    width:100%;border-collapse:collapse;margin-bottom:16px;
+    border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  }
+  th{
+    background:rgba(144,96,255,.12);color:var(--white);
+    padding:10px 14px;font-size:13px;font-weight:600;
+    text-align:left;letter-spacing:.3px;
+  }
+  td{
+    padding:10px 14px;font-size:14px;color:var(--text);
+    border-top:1px solid var(--border);vertical-align:top;
+  }
+  tr:last-child td{border-bottom:none;}
+  .yes{color:#60e090;font-weight:600;}
+  .no{color:var(--muted);}
+  .cond{color:#f0c040;font-weight:600;}
+
+  .toc{
+    background:rgba(255,255,255,.03);border:1px solid var(--border);
+    border-radius:12px;padding:20px 24px;margin-bottom:44px;
+  }
+  .toc h4{font-size:14px;font-weight:700;color:var(--white);margin-bottom:12px;letter-spacing:.5px;text-transform:uppercase;}
+  .toc ol{padding-left:18px;}
+  .toc li{font-size:14px;margin-bottom:4px;}
+
+  .contact-card{
+    background:rgba(255,255,255,.04);border:1px solid var(--border);
+    border-radius:16px;padding:28px;text-align:center;
+  }
+  .contact-card h4{font-size:17px;font-weight:700;color:var(--white);margin-bottom:6px;}
+  .contact-card .email{
+    font-size:18px;font-weight:600;color:var(--accent2);
+    display:block;margin:10px 0 6px;
+  }
+  .contact-card p{color:var(--muted);font-size:13px;margin:0;}
+
+  footer{
+    text-align:center;padding:32px 24px 48px;
+    border-top:1px solid var(--border);
+    color:var(--muted);font-size:13px;
+  }
+  footer span{color:var(--accent);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="app-icon">🚀</div>
+    <div class="header-text">
+      <h1>AstroSling</h1>
+      <p>Privacy Policy</p>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="hero">
+    <h2>Your Privacy Matters</h2>
+    <p>AstroSling is a single-player arcade game. We are committed to protecting your privacy and being completely transparent about how the app works.</p>
+    <span class="badge">Last updated: May 2026</span>
+  </div>
+
+  <div class="toc">
+    <h4>Table of Contents</h4>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#data-we-collect">Data We Collect</a></li>
+      <li><a href="#on-device">Data Stored On Your Device</a></li>
+      <li><a href="#advertising">Advertising (Google AdMob)</a></li>
+      <li><a href="#tracking">App Tracking Transparency (ATT)</a></li>
+      <li><a href="#purchases">In-App Purchases</a></li>
+      <li><a href="#children">Children's Privacy</a></li>
+      <li><a href="#data-rights">Your Privacy Rights</a></li>
+      <li><a href="#nutrition-label">Apple Privacy Nutrition Label</a></li>
+      <li><a href="#security">Security</a></li>
+      <li><a href="#changes">Changes to This Policy</a></li>
+      <li><a href="#contact">Contact Us</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. Overview -->
+  <section id="overview">
+    <h3><span class="icon">📋</span> 1. Overview</h3>
+    <p>This Privacy Policy explains how <strong>AstroSling</strong> ("the App", "we", "our") handles information when you play our game. This policy applies to the iOS application available on the Apple App Store.</p>
+    <div class="info-box">
+      <p><strong>In plain English:</strong> AstroSling is a free, ad-supported arcade game. We do not collect your personal data ourselves. The App contains advertising powered by <strong>Google AdMob</strong>, which may collect certain device identifiers to serve ads — but only if you grant permission via Apple's App Tracking Transparency prompt. You can also remove ads permanently with a one-time in-app purchase processed securely by Apple.</p>
+    </div>
+  </section>
+
+  <!-- 2. Data We Collect -->
+  <section id="data-we-collect">
+    <h3><span class="icon">📊</span> 2. Data We Collect</h3>
+    <p><strong>AstroSling itself does not collect, transmit, or store any personal information.</strong> We have no servers, no accounts, and no analytics of our own. The game runs entirely on your device.</p>
+    <p>However, the App integrates third-party services that may collect data as described in sections 4, 5, and 6 below:</p>
+    <ul>
+      <li><strong>Google AdMob</strong> — may collect device identifiers and usage data for advertising purposes (only with your consent via ATT).</li>
+      <li><strong>Apple StoreKit</strong> — handles in-app purchase transactions; Apple processes your payment information.</li>
+    </ul>
+  </section>
+
+  <!-- 3. On-Device Data -->
+  <section id="on-device">
+    <h3><span class="icon">📱</span> 3. Data Stored On Your Device</h3>
+    <p>AstroSling stores a small amount of game state <strong>exclusively on your device</strong> using iOS local storage. This data never leaves your device and is never transmitted anywhere.</p>
+    <div class="info-box">
+      <p><strong>What is stored locally:</strong></p>
+      <ul>
+        <li>Levels unlocked and completed</li>
+        <li>High scores and star ratings</li>
+        <li>Speed Run personal best times</li>
+        <li>Daily Challenge completion status</li>
+        <li>Unlocked ship skins</li>
+        <li>Sound and music preferences (on/off)</li>
+        <li>"Remove Ads" purchase status</li>
+      </ul>
+      <p style="margin-top:10px;margin-bottom:0;">This data is tied to your device and iCloud backup settings. Deleting the app removes all local game data.</p>
+    </div>
+  </section>
+
+  <!-- 4. Advertising -->
+  <section id="advertising">
+    <h3><span class="icon">📢</span> 4. Advertising (Google AdMob)</h3>
+    <p>AstroSling displays interstitial ads (full-screen ads shown between levels) powered by <strong>Google AdMob</strong>, a service provided by Google LLC.</p>
+
+    <h4 style="color:var(--white);margin-bottom:10px;margin-top:20px;">What AdMob may collect:</h4>
+    <ul>
+      <li><strong>Advertising Identifier (IDFA)</strong> — a resettable device identifier used to serve personalized ads and measure ad performance. Collected only if you grant ATT permission (see Section 5).</li>
+      <li><strong>Coarse location</strong> — approximate location derived from IP address, used for regional ad targeting.</li>
+      <li><strong>Interaction data</strong> — whether you viewed or tapped an ad.</li>
+      <li><strong>Diagnostics</strong> — basic app crash and performance data.</li>
+    </ul>
+
+    <div class="warning-box">
+      <p>⚠️ If you <strong>deny</strong> the App Tracking Transparency (ATT) permission, AdMob will not access your IDFA and will serve non-personalized ads only. Your choice does not affect gameplay.</p>
+    </div>
+
+    <p>Ads are shown between levels, approximately every 3 levels. Ads are never shown during active gameplay.</p>
+    <p>You can remove all ads permanently with the "Remove Ads" in-app purchase described in Section 6. Users who purchase "Remove Ads" are never shown ads, and AdMob is not initialized for those users.</p>
+
+    <p>For more information about Google's data practices, see Google's Privacy Policy: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></p>
+  </section>
+
+  <!-- 5. ATT -->
+  <section id="tracking">
+    <h3><span class="icon">🔒</span> 5. App Tracking Transparency (ATT)</h3>
+    <p>Apple requires apps to ask your permission before accessing your device's Advertising Identifier (IDFA) for cross-app tracking. When you first launch AstroSling, iOS will display Apple's standard ATT permission prompt.</p>
+
+    <div class="info-box">
+      <p><strong>If you tap "Allow":</strong> AdMob may use your IDFA to show personalized ads and measure their effectiveness across apps.</p>
+      <p style="margin-bottom:0;margin-top:8px;"><strong>If you tap "Ask App Not to Track":</strong> Your IDFA is not accessed. AdMob will only show non-personalized (contextual) ads. Gameplay is completely unaffected.</p>
+    </div>
+
+    <p>You can change your ATT choice at any time in <strong>iOS Settings → Privacy &amp; Security → Tracking → AstroSling</strong>.</p>
+  </section>
+
+  <!-- 6. IAP -->
+  <section id="purchases">
+    <h3><span class="icon">💳</span> 6. In-App Purchases</h3>
+    <p>AstroSling offers one optional in-app purchase:</p>
+    <div class="info-box">
+      <p><strong>Remove Ads</strong> — a one-time, non-consumable purchase that permanently removes all advertisements from the game.</p>
+    </div>
+
+    <p>All payments are processed securely by <strong>Apple</strong> through the App Store. We do not receive, store, or process your payment card details. Apple's payment processing is governed by Apple's own Privacy Policy and Terms of Service.</p>
+    <p>The "Remove Ads" status is stored locally on your device. You can restore your purchase on a new device using the <strong>"Restore Purchases"</strong> button in the game's About screen.</p>
+    <p>For questions about billing, contact Apple Support or visit <a href="https://reportaproblem.apple.com" target="_blank" rel="noopener">reportaproblem.apple.com</a>.</p>
+  </section>
+
+  <!-- 7. Children -->
+  <section id="children">
+    <h3><span class="icon">👶</span> 7. Children's Privacy</h3>
+    <p>AstroSling is rated <strong>4+</strong> on the Apple App Store and is suitable for all ages.</p>
+    <p>We do not knowingly collect personal data from children. The App itself collects no personal data from any user. AdMob, when initialized, applies additional protections for users who may be minors in accordance with Google's policies and applicable law (COPPA, GDPR-K).</p>
+    <p>If you believe we have inadvertently collected information from a child, please contact us at <a href="mailto:arche.boost@gmail.com">arche.boost@gmail.com</a> so we can take prompt corrective action.</p>
+  </section>
+
+  <!-- 8. Data Rights -->
+  <section id="data-rights">
+    <h3><span class="icon">⚖️</span> 8. Your Privacy Rights</h3>
+    <p>Since AstroSling itself does not collect or store personal data on our servers, most traditional data access/deletion requests are not applicable to us directly.</p>
+    <p>However, if you are in the EU (GDPR), California (CCPA), or another jurisdiction with applicable privacy laws, you have the right to:</p>
+    <ul>
+      <li><strong>Opt out of personalized ads</strong> — deny or revoke ATT permission (Section 5)</li>
+      <li><strong>Delete local game data</strong> — delete the App from your device</li>
+      <li><strong>Access or deletion requests for AdMob data</strong> — contact Google via their privacy tools at <a href="https://safety.google/privacy/privacy-controls/" target="_blank" rel="noopener">safety.google/privacy</a></li>
+      <li><strong>Contact us</strong> for any other privacy questions: <a href="mailto:arche.boost@gmail.com">arche.boost@gmail.com</a></li>
+    </ul>
+  </section>
+
+  <!-- 9. Apple Nutrition Label -->
+  <section id="nutrition-label">
+    <h3><span class="icon">🍎</span> 9. Apple Privacy Nutrition Label</h3>
+    <p>In accordance with Apple's App Privacy requirements, AstroSling declares the following data practices in the App Store privacy nutrition label:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Data Type</th>
+          <th>Collected?</th>
+          <th>Purpose</th>
+          <th>Linked to You?</th>
+          <th>Used for Tracking?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Contact Info</td>
+          <td class="no">No</td>
+          <td>—</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+        </tr>
+        <tr>
+          <td>Health &amp; Fitness</td>
+          <td class="no">No</td>
+          <td>—</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+        </tr>
+        <tr>
+          <td>Financial Info</td>
+          <td class="no">No</td>
+          <td>—</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+        </tr>
+        <tr>
+          <td>Location</td>
+          <td class="no">No</td>
+          <td>—</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+        </tr>
+        <tr>
+          <td>Sensitive Info</td>
+          <td class="no">No</td>
+          <td>—</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+        </tr>
+        <tr>
+          <td>Contacts</td>
+          <td class="no">No</td>
+          <td>—</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+        </tr>
+        <tr>
+          <td>User Content</td>
+          <td class="no">No</td>
+          <td>—</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+        </tr>
+        <tr>
+          <td>Browsing History</td>
+          <td class="no">No</td>
+          <td>—</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+        </tr>
+        <tr>
+          <td>Search History</td>
+          <td class="no">No</td>
+          <td>—</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+        </tr>
+        <tr>
+          <td>Identifiers (IDFA)</td>
+          <td class="cond">Conditionally</td>
+          <td>Advertising (AdMob, only with ATT consent)</td>
+          <td class="cond">Conditionally</td>
+          <td class="cond">Conditionally</td>
+        </tr>
+        <tr>
+          <td>Purchase History</td>
+          <td class="cond">Conditionally</td>
+          <td>In-App Purchase verification (Apple)</td>
+          <td class="no">No (handled by Apple)</td>
+          <td class="no">No</td>
+        </tr>
+        <tr>
+          <td>Usage Data</td>
+          <td class="cond">Conditionally</td>
+          <td>Ad performance measurement (AdMob, only with ATT consent)</td>
+          <td class="no">Not linked to identity</td>
+          <td class="cond">Conditionally</td>
+        </tr>
+        <tr>
+          <td>Diagnostics</td>
+          <td class="cond">Conditionally</td>
+          <td>App stability (AdMob SDK diagnostics)</td>
+          <td class="no">No</td>
+          <td class="no">No</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="highlight-box">
+      <p><strong>Note:</strong> "Conditionally" means data is only collected for users who: (a) are on the free version (no "Remove Ads" purchase), AND (b) have granted App Tracking Transparency permission. Users who have purchased "Remove Ads" are never shown ads and AdMob is not initialized for those users.</p>
+    </div>
+  </section>
+
+  <!-- 10. Security -->
+  <section id="security">
+    <h3><span class="icon">🛡️</span> 10. Security</h3>
+    <p>Since AstroSling does not transmit personal data to our own servers, there is minimal attack surface for data breaches affecting our users. Game progress is stored locally on your device, protected by iOS's standard app sandbox security.</p>
+    <p>Third-party SDKs (AdMob, Apple StoreKit) are maintained by their respective companies and follow industry security standards.</p>
+  </section>
+
+  <!-- 11. Changes -->
+  <section id="changes">
+    <h3><span class="icon">🔄</span> 11. Changes to This Policy</h3>
+    <p>We may update this Privacy Policy from time to time. If we make material changes, we will update the "Last updated" date at the top of this page. We encourage you to review this policy periodically.</p>
+    <p>Continued use of the App after changes become effective constitutes your acceptance of the updated policy.</p>
+  </section>
+
+  <!-- 12. Contact -->
+  <section id="contact">
+    <h3><span class="icon">✉️</span> 12. Contact Us</h3>
+    <p>If you have any questions, concerns, or requests about this Privacy Policy or our data practices, please contact us:</p>
+    <div class="contact-card">
+      <h4>AstroSling Support</h4>
+      <a href="mailto:arche.boost@gmail.com" class="email">arche.boost@gmail.com</a>
+      <p>We aim to respond within 5 business days.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>© 2026 <span>AstroSling</span>. All rights reserved.</p>
+  <p style="margin-top:6px;">This policy was last updated on May 6, 2026.</p>
+</footer>
+
+</body>
+</html>

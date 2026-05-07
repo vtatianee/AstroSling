@@ -1,0 +1,19 @@
+{
+  "appId": "com.arche.astrosling",
+  "appName": "AstroSling",
+  "webDir": "www",
+  "ios": {
+    "allowsLinkPreview": false,
+    "scrollEnabled": false,
+    "contentInset": "never",
+    "backgroundColor": "#02000c"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "server": {
+    "allowNavigation": []
+  }
+}

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Article Number Extractor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0f1117;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #a78bfa;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #888;
+      margin-bottom: 36px;
+    }
+
+    .card {
+      background: #1a1d2e;
+      border: 1px solid #2e3150;
+      border-radius: 14px;
+      padding: 28px;
+      width: 100%;
+      max-width: 620px;
+      margin-bottom: 20px;
+    }
+
+    .drop-zone {
+      border: 2px dashed #4c4f8a;
+      border-radius: 10px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: #a78bfa;
+      background: #21234a;
+    }
+
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .drop-label {
+      font-size: 1rem;
+      color: #a0a0b0;
+    }
+
+    .drop-label strong {
+      color: #a78bfa;
+    }
+
+    .file-name {
+      margin-top: 14px;
+      font-size: 0.85rem;
+      color: #6ee7b7;
+      min-height: 20px;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 32px;
+      background: #7c3aed;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      width: 100%;
+    }
+
+    .btn:hover { background: #6d28d9; }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { background: #3a2d6e; color: #888; cursor: not-allowed; }
+
+    .result-card {
+      display: none;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .result-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #a78bfa;
+    }
+
+    .badge {
+      background: #2e3150;
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.82rem;
+      color: #6ee7b7;
+      font-weight: 600;
+    }
+
+    .copy-btn {
+      padding: 6px 18px;
+      background: #1f4d3e;
+      color: #6ee7b7;
+      border: 1px solid #2d7a5e;
+      border-radius: 7px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .copy-btn:hover { background: #2d6b55; }
+
+    .numbers-box {
+      background: #12141f;
+      border: 1px solid #2e3150;
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.95rem;
+      line-height: 1.9;
+      max-height: 320px;
+      overflow-y: auto;
+      word-break: break-all;
+      color: #e0e0e0;
+    }
+
+    .numbers-box span {
+      display: inline-block;
+      background: #1e2040;
+      border: 1px solid #3b3f6e;
+      border-radius: 5px;
+      padding: 2px 10px;
+      margin: 3px 4px;
+      color: #c4b5fd;
+      font-weight: 600;
+    }
+
+    .error-msg {
+      color: #f87171;
+      font-size: 0.9rem;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .copy-feedback {
+      font-size: 0.78rem;
+      color: #6ee7b7;
+      margin-left: 8px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .copy-feedback.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <h1>Article Number Extractor</h1>
+  <p class="subtitle">Carregue um arquivo .txt e extraia os ArticleNumbers únicos</p>
+
+  <div class="card">
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".txt,.log,.json,.xml,text/plain" />
+      <span class="drop-icon">📂</span>
+      <div class="drop-label">
+        <strong>Clique para selecionar</strong> ou arraste o arquivo aqui
+      </div>
+      <div class="drop-label" style="font-size:0.8rem;margin-top:6px;">
+        Suporta .txt, .log, .json, .xml
+      </div>
+    </div>
+    <div class="file-name" id="fileName"></div>
+    <div class="error-msg" id="errorMsg">Nenhum ArticleNumber encontrado no arquivo.</div>
+    <button class="btn" id="extractBtn" disabled>Extrair ArticleNumbers</button>
+  </div>
+
+  <div class="card result-card" id="resultCard">
+    <div class="result-header">
+      <span class="result-title">ArticleNumbers únicos encontrados</span>
+      <span class="badge" id="countBadge">0 artigos</span>
+      <button class="copy-btn" id="copyBtn">
+        Copiar tudo <span class="copy-feedback" id="copyFeedback">✓ Copiado!</span>
+      </button>
+    </div>
+    <div class="numbers-box" id="numbersBox"></div>
+  </div>
+
+  <script>
+    const fileInput  = document.getElementById('fileInput');
+    const dropZone   = document.getElementById('dropZone');
+    const fileName   = document.getElementById('fileName');
+    const extractBtn = document.getElementById('extractBtn');
+    const resultCard = document.getElementById('resultCard');
+    const numbersBox = document.getElementById('numbersBox');
+    const countBadge = document.getElementById('countBadge');
+    const copyBtn    = document.getElementById('copyBtn');
+    const errorMsg   = document.getElementById('errorMsg');
+    const copyFeedback = document.getElementById('copyFeedback');
+
+    let fileContent = '';
+
+    // Drag & drop
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) loadFile(file);
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) loadFile(fileInput.files[0]);
+    });
+
+    function loadFile(file) {
+      fileName.textContent = '📄 ' + file.name;
+      errorMsg.style.display = 'none';
+      resultCard.style.display = 'none';
+      const reader = new FileReader();
+      reader.onload = e => {
+        fileContent = e.target.result;
+        extractBtn.disabled = false;
+      };
+      reader.readAsText(file, 'UTF-8');
+    }
+
+    extractBtn.addEventListener('click', () => {
+      errorMsg.style.display = 'none';
+
+      // Match ArticleNumber: <digits>  (case-insensitive)
+      const regex = /ArticleNumber[:\s]+(\d+)/gi;
+      const found = new Set();
+      let match;
+      while ((match = regex.exec(fileContent)) !== null) {
+        found.add(match[1]);
+      }
+
+      if (found.size === 0) {
+        errorMsg.style.display = 'block';
+        resultCard.style.display = 'none';
+        return;
+      }
+
+      const sorted = [...found].sort((a, b) => Number(a) - Number(b));
+
+      countBadge.textContent = sorted.length + (sorted.length === 1 ? ' artigo' : ' artigos');
+      numbersBox.innerHTML = sorted.map(n => `<span>${n}</span>`).join('');
+      resultCard.style.display = 'block';
+    });
+
+    copyBtn.addEventListener('click', () => {
+      const spans = numbersBox.querySelectorAll('span');
+      const text = [...spans].map(s => s.textContent).join('\n');
+      navigator.clipboard.writeText(text).then(() => {
+        copyFeedback.classList.add('show');
+        setTimeout(() => copyFeedback.classList.remove('show'), 2000);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -15,7 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         try? AVAudioSession.sharedInstance().setActive(true)
         // Initialize Google Mobile Ads SDK as early as possible.
         // ATT authorization request is handled by @capacitor-community/admob at JS level.
-        GADMobileAds.sharedInstance().start(completionHandler: nil)
+        MobileAds.shared.start(completionHandler: nil)
         return true
     }
 

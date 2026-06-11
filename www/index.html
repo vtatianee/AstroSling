@@ -402,7 +402,8 @@
     position:absolute;inset:0;z-index:400;pointer-events:none;
     opacity:0;transition:opacity .4s;
   }
-  #tutorialOverlay.show{opacity:1;pointer-events:all;}
+  #tutorialOverlay.show{opacity:1;}
+  #tutorialOverlay.show #tutDismiss{pointer-events:all;}
   .tut-hint{
     position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px;
     pointer-events:none;
@@ -773,7 +774,7 @@
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 'use strict';
 // ═══════════════════════════════════════════
 //  ASTRO SLING — v4 (achievements + 25 levels)

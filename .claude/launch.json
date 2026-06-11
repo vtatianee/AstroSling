@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "AstroSling (static server)",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", ".", "--listen", "3000"],
-      "port": 3000
+      "name": "astrosling",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8774"],
+      "port": 8774
     }
   ]
 }

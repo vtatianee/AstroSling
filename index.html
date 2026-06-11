@@ -35,6 +35,8 @@
 
   .screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity 0.3s ease;z-index:2;}
   .screen.active{pointer-events:all;opacity:1;}
+  .screen:not(.active) *{pointer-events:none !important;}
+  #tutorialOverlay:not(.show) *{pointer-events:none !important;}
 
   /* TITLE */
   #titleScreen{background:transparent;}
@@ -284,7 +286,7 @@
   .btn-green  {background:linear-gradient(160deg,#35c45a 0%,#177535 100%);color:#fff;box-shadow:0 4px 0 rgba(0,60,20,.7),0 8px 18px rgba(40,180,80,.28);}
   .btn-orange {background:linear-gradient(160deg,#ff7030 0%,#c03000 100%);color:#fff;box-shadow:0 4px 0 rgba(80,10,0,.7),0 8px 18px rgba(200,70,0,.28);}
   .btn-blue   {background:linear-gradient(160deg,#3090ff 0%,#1050cc 100%);color:#fff;box-shadow:0 4px 0 rgba(0,20,80,.7),0 8px 18px rgba(40,120,255,.28);}
-  .btn-ghost  {background:rgba(255,255,255,.05);color:rgba(255,255,255,.55);border-color:rgba(255,255,255,.1);box-shadow:none;}
+  .btn-ghost  {background:rgba(255,255,255,.07);color:rgba(255,255,255,.9);border-color:rgba(255,255,255,.18);box-shadow:none;}
   .btn-red    {background:linear-gradient(160deg,#cc2020 0%,#880010 100%);color:#fff;box-shadow:0 4px 0 rgba(60,0,0,.7);}
   .btn-sm{font-size:14px;padding:8px 22px;}
 
@@ -456,6 +458,34 @@
   .about-section p,.about-section a{font-size:13px;color:rgba(220,215,240,.65);line-height:1.65;display:block;margin-bottom:4px;}
   .about-section a{color:rgba(120,190,255,.8);text-decoration:none;}
   .about-section a:hover{text-decoration:underline;}
+  /* ACHIEVEMENTS MODAL */
+  #achievementsModal{position:absolute;inset:0;z-index:500;background:rgba(2,0,12,.88);backdrop-filter:blur(20px);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0 0 32px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .28s;}
+  #achievementsModal.active{opacity:1;pointer-events:all;}
+  /* SKIN MODAL */
+  #skinModal{position:absolute;inset:0;z-index:500;background:rgba(2,0,12,.92);backdrop-filter:blur(20px);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .28s;}
+  #skinModal.active{opacity:1;pointer-events:all;}
+  .skin-panel{display:flex;flex-direction:column;align-items:center;padding:28px 20px 20px;width:100%;max-width:380px;}
+  .skin-title{font-family:'Fredoka One',cursive;font-size:22px;color:#fff;letter-spacing:1px;margin-bottom:18px;}
+  #skinGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;max-width:340px;}
+  .skin-card{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:border-color .18s,background .18s;touch-action:manipulation;}
+  .skin-card:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.2);}
+  .skin-card.selected{border-color:rgba(130,100,255,.7);background:rgba(80,40,200,.18);}
+  .skin-card.locked{opacity:.38;cursor:default;}
+  .skin-swatch{width:52px;height:30px;border-radius:8px;display:block;}
+  .skin-name{font-family:'Fredoka One',cursive;font-size:12px;color:#fff;letter-spacing:.5px;text-align:center;}
+  .skin-lock{font-size:11px;color:rgba(200,180,255,.5);margin-top:2px;}
+  /* DAILY DARK MODIFIER */
+  body.daily-dark #gameCanvas{filter:brightness(0.22);}
+  body.daily-dark #hud{filter:brightness(0.22);}
+  .ach-modal-count{font-family:'Fredoka One',cursive;font-size:13px;color:rgba(200,180,255,.65);letter-spacing:1px;}
+  #achModalBody{width:100%;max-width:360px;padding:16px 16px 0;display:flex;flex-direction:column;gap:6px;}
+  .ach-section-lbl{font-family:'Fredoka One',cursive;font-size:10px;color:rgba(140,170,255,.55);letter-spacing:3px;text-transform:uppercase;padding:10px 4px 4px;}
+  .ach-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:10px 14px;}
+  .ach-row.earned{border-color:rgba(120,80,255,.3);background:rgba(80,40,200,.1);}
+  .ach-row.locked{opacity:.28;filter:grayscale(.7);}
+  .ach-row-icon{font-size:22px;width:30px;text-align:center;flex-shrink:0;}
+  .ach-row-name{font-family:'Fredoka One',cursive;font-size:13px;color:#fff;letter-spacing:.4px;}
+  .ach-row-desc{font-size:11px;color:rgba(200,190,230,.52);margin-top:1px;}
   .about-app-icon{width:64px;height:64px;border-radius:16px;
     background:linear-gradient(135deg,#3010a0,#6030ff);
     display:flex;align-items:center;justify-content:center;font-size:32px;
@@ -472,6 +502,8 @@
   <div id="titleScreen" class="screen active">
     <!-- About button inside title screen, top-left -->
     <button id="aboutBtn" onclick="Game.showAbout()">ℹ️ About</button>
+    <!-- Skin button top-right -->
+    <button onclick="Game.showSkins()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:20px;padding:6px 10px;cursor:pointer;touch-action:manipulation;z-index:30;line-height:1">🎨</button>
     <canvas id="titlePlanetCanvas" width="160" height="160" style="margin-bottom:18px"></canvas>
     <div class="title-logo">ASTRO<br>SLING</div>
     <div class="title-sub">Arcade Space Puzzles</div>
@@ -479,6 +511,12 @@
     <button type="button" class="btn btn-primary" id="titlePlayBtn" style="min-width:200px;position:relative;z-index:30;pointer-events:all;" onclick="return Game.startFirstLevel(event)">▶ PLAY</button>
     <div style="height:8px"></div>
     <button class="btn btn-ghost btn-sm" id="titleSelectBtn" style="min-width:200px">SELECT LEVEL</button>
+    <div style="height:8px"></div>
+    <button class="btn btn-ghost btn-sm" style="min-width:200px" onclick="Game.showAchievements()">🏆 ACHIEVEMENTS</button>
+    <div style="height:8px"></div>
+    <button class="btn btn-ghost btn-sm" style="min-width:200px" onclick="Game.startSpeedRun()">⏱ SPEED RUN</button>
+    <div style="height:8px"></div>
+    <button class="btn btn-ghost btn-sm" style="min-width:200px" id="dailyBtn" onclick="Game.startDailyChallenge()">📅 DAILY CHALLENGE</button>
     <div style="height:10px"></div>
     <button class="btn btn-gold btn-sm" id="titleRemoveAdsBtn" style="min-width:200px" onclick="Game.showRemoveAds()">⭐ REMOVE ADS — $2.99</button>
     <div style="height:10px"></div>
@@ -511,7 +549,7 @@
     <div style="font-family:'Fredoka One',cursive;font-size:22px;letter-spacing:4px;color:#70c0ff;margin-bottom:14px;position:absolute;top:18px;left:50%;transform:translateX(-50%);white-space:nowrap;text-shadow:0 0 12px rgba(80,180,255,.5)">GALAXIES</div>
     <div id="levelGrid" style="width:100%;max-width:360px;padding:0 14px 50px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;overflow-y:auto;margin-top:20px"></div>
     <div style="position:absolute;top:14px;left:14px">
-      <button class="btn btn-ghost btn-sm" onclick="Game.showMenu()">← BACK</button>
+      <button class="btn btn-ghost btn-sm" onclick="Game.showTitle()">← BACK</button>
     </div>
   </div>
 
@@ -560,6 +598,7 @@
         <div class="purchase-perk">Restored automatically on reinstall</div>
       </div>
       <button class="purchase-confirm" onclick="AdManager.confirmPurchase()">BUY FOR $2.99</button>
+      <button class="btn btn-ghost btn-sm" style="margin-top:10px;font-size:13px" onclick="AdManager.restorePurchases()">Restore Purchases</button>
       <div class="purchase-cancel" onclick="AdManager.cancelPurchase()">No thanks</div>
     </div>
   </div>
@@ -639,6 +678,26 @@
     </div>
   </div>
 
+  <!-- ACHIEVEMENTS MODAL -->
+  <div id="achievementsModal">
+    <div class="about-header">
+      <h2>🏆 Achievements</h2>
+      <span class="ach-modal-count" id="achModalCount">0/36</span>
+      <button class="about-close" onclick="Game.closeAchievements()">✕</button>
+    </div>
+    <div id="achModalBody"></div>
+  </div>
+
+  <!-- SKIN MODAL -->
+  <div id="skinModal">
+    <div class="skin-panel">
+      <div class="skin-title">🎨 Ship Skins</div>
+      <div id="skinGrid"></div>
+      <div style="height:18px"></div>
+      <button class="btn btn-ghost btn-sm" style="min-width:200px" onclick="Game.hideSkins()">← BACK</button>
+    </div>
+  </div>
+
   <!-- LEVEL TRANSITION OVERLAY (CSS-only, guaranteed to work) -->
   <div id="lvlTransition">
     <div class="lvlt-complete" id="lvltComplete">LEVEL COMPLETE!</div>
@@ -672,7 +731,7 @@
     </div>
     <div style="height:4px"></div>
     <button class="btn btn-ghost btn-sm" onclick="Game.showLevelSelect()">LEVELS</button>
-    <button class="btn btn-ghost btn-sm" onclick="Game.showMenu()">MENU</button>
+    <button class="btn btn-ghost btn-sm" onclick="Game.goToMainMenu()">MENU</button>
   </div>
 
   <!-- WIN -->
@@ -680,6 +739,7 @@
     <div class="win-title">NICE SHOT!</div>
     <div class="win-stars" id="winStars">⭐⭐⭐</div>
     <div class="score-display" id="winScore">+300</div>
+    <div id="winSpeedRunTime" style="display:none;font-family:'Fredoka One',cursive;font-size:15px;color:#00ccff;letter-spacing:1px;margin-top:6px;text-shadow:0 0 10px rgba(0,200,255,0.6)"></div>
     <div style="height:18px"></div>
     <button class="btn btn-green" onclick="Game.nextLevel()">NEXT LEVEL ›</button>
     <div style="height:8px"></div>
@@ -706,7 +766,7 @@
     <div style="color:#ffd040;font-size:12px;letter-spacing:2px;margin-bottom:20px" id="endlessBest">BEST: 0</div>
     <button class="btn btn-orange" onclick="Game.startEndless()">PLAY AGAIN</button>
     <div style="height:8px"></div>
-    <button class="btn btn-ghost btn-sm" onclick="Game.showMenu()">MENU</button>
+    <button class="btn btn-ghost btn-sm" onclick="Game.showTitle()">MENU</button>
   </div>
 </div>
 
@@ -925,63 +985,135 @@ const Music=(()=>{
 })();
 
 // ── ATT — Apple App Tracking Transparency ─────────────────
-// In production (Capacitor): replace with @capacitor-community/app-tracking-transparency
-// requestTrackingAuthorization() from the plugin
+// Handled automatically by @capacitor-community/admob when initialized
+// with requestTrackingAuthorization:true. No custom modal needed.
 const ATT={
-  _key:'cosmo_att',
-  init(){
-    if(localStorage.getItem(this._key))return; // already asked
-    setTimeout(()=>{
-      const el=document.getElementById('attModal');
-      if(el){el.classList.add('active');}
-    },1200); // show 1.2s after launch
-  },
-  respond(allow){
-    localStorage.setItem(this._key, allow?'granted':'denied');
-    const el=document.getElementById('attModal');
-    if(el){el.style.opacity='0';setTimeout(()=>el.classList.remove('active'),300);}
-    // In Capacitor: AppTrackingTransparency.requestPermission() returns the status
-    // You can then pass it to AdMob: AdMob.setApplicationMuted(!allow)
-    console.log('ATT response:', allow?'Authorized':'Denied');
-  }
+  // ATT prompt is triggered by AdMob.initialize() on iOS 14+.
+  // The #attModal HTML is kept for web-preview purposes but hidden on native.
 };
 
 // ── AD MANAGER ─────────────────────────────────────────────
-// Shows interstitial every 3 levels. Integrates with Google AdMob via Capacitor.
-// Real integration: import { AdMob, InterstitialAdPluginEvents } from '@capacitor-community/admob'
-// AdMob.prepareInterstitial({ adId: 'ca-app-pub-XXXXX/YYYYY' })
-// AdMob.showInterstitial()
+// Interstitial every 3 levels via @capacitor-community/admob.
+// IAP (Remove Ads, $2.99) via cordova-plugin-purchase (CdvPurchase).
+//
+// ⚠️  Replace placeholder IDs before App Store submission:
+//   ADMOB_APP_ID   → your real AdMob App ID (Info.plist GADApplicationIdentifier)
+//   INTERSTITIAL_ID → your real Interstitial Ad Unit ID
+//   PRODUCT_ID      → com.arche.astrosling.removeads (configured in App Store Connect)
 const AdManager={
-  _noAdsKey:'cosmo_noads',
+  _noAdsKey:'astro_noads',
   _levelCount:0,
-  _skipTimer:null,
-  _cb:null,
+  _initialized:false,
+  PRODUCT_ID:'com.arche.astrosling.removeads',
+  INTERSTITIAL_ID:'ca-app-pub-8694151594129435/8522303091',
 
   get noAds(){return localStorage.getItem(this._noAdsKey)==='1';},
 
-  purchaseRemoveAds(){
-    // Show the in-game purchase modal
-    const m=document.getElementById('purchaseModal');
-    if(m) m.classList.add('active');
+  // ── Initialize AdMob + IAP on app start ──
+  async init(){
+    this._syncRemoveAdsUI();
+    const isNative=window.Capacitor?.isNativePlatform();
+
+    // ── AdMob ──
+    if(isNative && !this.noAds){
+      try{
+        const {AdMob}=Capacitor.Plugins;
+        if(AdMob){
+          await AdMob.initialize({
+            requestTrackingAuthorization:true, // triggers ATT prompt on iOS 14+
+            initializeForTesting:false,
+          });
+          this._initialized=true;
+        }
+      }catch(e){console.warn('AdMob init error:',e);}
+    }
+
+    // ── In-App Purchase (cordova-plugin-purchase / CdvPurchase) ──
+    if(isNative && window.CdvPurchase){
+      const {store,ProductType,Platform}=CdvPurchase;
+      store.register([{
+        id:this.PRODUCT_ID,
+        type:ProductType.NON_CONSUMABLE,
+        platform:Platform.APPLE_APPSTORE,
+      }]);
+      store.when().approved(transaction=>{
+        transaction.verify();
+      });
+      store.when().verified(receipt=>{
+        receipt.finish();
+        this._grantNoAds();
+      });
+      store.initialize([Platform.APPLE_APPSTORE]);
+    }
   },
 
-  confirmPurchase(){
-    // In production: replace with StoreKit (iOS) via Capacitor
-    // import { InAppPurchase2 } from '@ionic-native/in-app-purchase-2'
-    // store.register({ id:'com.cosmosling.removeads', type: store.NON_CONSUMABLE })
-    // store.order('com.cosmosling.removeads')
-    localStorage.setItem(this._noAdsKey,'1');
-    const m=document.getElementById('purchaseModal');
-    if(m)m.classList.remove('active');
-    this._syncRemoveAdsUI();
-    // Show success toast
-    const t=document.getElementById('purchaseToast');
-    if(t){t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+  // ── Show interstitial (called after every 3rd level) ──
+  async showInterstitial(){
+    if(this.noAds||!this._initialized)return;
+    try{
+      const {AdMob}=Capacitor.Plugins;
+      await AdMob.prepareInterstitial({adId:this.INTERSTITIAL_ID});
+      await AdMob.showInterstitial();
+    }catch(e){console.warn('AdMob interstitial error:',e);}
   },
+
+  // ── Called from onLevelWin() ──
+  onLevelComplete(){
+    this._levelCount++;
+    if(this.noAds)return false;
+    if(this._levelCount%3!==0)return false;
+    return true;
+  },
+
+  // ── Purchase modal ──
+  purchaseRemoveAds(){
+    const m=document.getElementById('purchaseModal');
+    if(m)m.classList.add('active');
+  },
+
+  // ── Trigger real StoreKit purchase ──
+  async confirmPurchase(){
+    const isNative=window.Capacitor?.isNativePlatform();
+    if(!isNative){
+      // Dev/browser mode: simulate purchase
+      this._grantNoAds();
+      const m=document.getElementById('purchaseModal');
+      if(m)m.classList.remove('active');
+      return;
+    }
+    try{
+      const {store}=CdvPurchase;
+      const product=store.get(this.PRODUCT_ID);
+      if(product)await store.order(product);
+    }catch(e){
+      console.warn('IAP purchase error:',e);
+    }
+  },
+
+  // ── Restore previous purchases (Apple requires this button) ──
+  async restorePurchases(){
+    const isNative=window.Capacitor?.isNativePlatform();
+    if(!isNative)return;
+    try{
+      const {store,Platform}=CdvPurchase;
+      await store.restorePurchases();
+    }catch(e){console.warn('Restore error:',e);}
+  },
+
   cancelPurchase(){
     const m=document.getElementById('purchaseModal');
     if(m)m.classList.remove('active');
   },
+
+  _grantNoAds(){
+    localStorage.setItem(this._noAdsKey,'1');
+    this._syncRemoveAdsUI();
+    const m=document.getElementById('purchaseModal');
+    if(m)m.classList.remove('active');
+    const t=document.getElementById('purchaseToast');
+    if(t){t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+  },
+
   _syncRemoveAdsUI(){
     const noAds=this.noAds;
     const label=noAds?'✅ ADS REMOVED':'⭐ REMOVE ADS — $2.99';
@@ -993,49 +1125,25 @@ const AdManager={
       b.style.pointerEvents=noAds?'none':'all';
     });
   },
-
-  onLevelComplete(){
-    this._levelCount++;
-    if(this.noAds)return false;        // purchased: skip ads
-    if(this._levelCount%3!==0)return false; // only every 3 levels
-    return true;  // show ad
-  },
-
-  show(cb){
-    this._cb=cb;
-    const el=document.getElementById('adOverlay');
-    const btn=document.getElementById('adSkipBtn');
-    const cntEl=document.getElementById('adCountdown');
-    if(!el||!btn)return cb&&cb();
-
-    let secs=5;
-    btn.classList.remove('ready');
-    btn.textContent='SKIP AD';
-    cntEl.textContent=`Skip available in ${secs}s…`;
-    el.classList.add('active');
-
-    clearInterval(this._skipTimer);
-    this._skipTimer=setInterval(()=>{
-      secs--;
-      if(secs<=0){
-        clearInterval(this._skipTimer);
-        btn.textContent='SKIP AD ✕';
-        btn.classList.add('ready');
-        cntEl.textContent='';
-      } else {
-        cntEl.textContent=`Skip available in ${secs}s…`;
-      }
-    },1000);
-  },
-
-  skip(){
-    clearInterval(this._skipTimer);
-    const el=document.getElementById('adOverlay');
-    if(el)el.classList.remove('active');
-    if(this._cb){const f=this._cb;this._cb=null;f();}
-  }
 };
 
+
+// ── SKINS ─────────────────────────────────────────────────
+const SKIN_DEFS=[
+  {id:'default',name:'Astro Blue', hint:'Default',        wing:'#1a3566',body1:'#0e1e3a',body2:'#80bef8',trail:'#4090ff',stripe:'rgba(255,190,40,0.7)', shield:'rgba(50,130,255,0.14)', unlockId:null},
+  {id:'ember',  name:'Ember',      hint:'Beat level 10',  wing:'#5a1a00',body1:'#2a0800',body2:'#ff8040',trail:'#ff4400',stripe:'rgba(255,220,80,0.7)',  shield:'rgba(255,80,20,0.14)',  unlockId:'lvl_10'},
+  {id:'jade',   name:'Jade',       hint:'3★ level 1',     wing:'#0a3a1a',body1:'#051a0a',body2:'#50e880',trail:'#20d060',stripe:'rgba(120,255,160,0.7)',shield:'rgba(30,200,80,0.14)',   unlockId:'lvl_01'},
+  {id:'gold',   name:'Solar Gold', hint:'30 stars total', wing:'#3a2a00',body1:'#1a1200',body2:'#ffd040',trail:'#ffaa00',stripe:'rgba(255,255,160,0.7)',shield:'rgba(255,200,0,0.14)',   unlockId:'stargazer'},
+  {id:'void',   name:'Void',       hint:'All 25 levels',  wing:'#1a0030',body1:'#0a0015',body2:'#b060ff',trail:'#8020ff',stripe:'rgba(200,120,255,0.7)',shield:'rgba(120,40,255,0.14)',  unlockId:'master_sling'},
+  {id:'ice',    name:'Arctic Ice', hint:'Daily challenge',wing:'#002840',body1:'#001520',body2:'#a0e8ff',trail:'#40ccff',stripe:'rgba(200,240,255,0.7)',shield:'rgba(80,200,255,0.14)',  unlockId:'daily_ace'},
+];
+const SkinManager={
+  _sel:'default',
+  init(){const s=localStorage.getItem('astro_skin');if(s)this._sel=s;},
+  current(){return SKIN_DEFS.find(s=>s.id===this._sel)||SKIN_DEFS[0];},
+  select(id){this._sel=id;localStorage.setItem('astro_skin',id);},
+  unlocked(skin){return !skin.unlockId||Achievements.unlocked.has(skin.unlockId);}
+};
 
 // ── ACHIEVEMENTS ──────────────────────────────────────────
 const ACHIEVEMENT_DEFS=[
@@ -1050,6 +1158,34 @@ const ACHIEVEMENT_DEFS=[
   {id:'endless_drifter',icon:'♾️',name:'Endless Drifter',  desc:'Score 500+ in endless mode'},
   {id:'galaxy_explorer',icon:'🔭',name:'Galaxy Explorer',  desc:'Complete all 10 original levels'},
   {id:'master_sling',  icon:'🏆', name:'Master Sling',     desc:'Complete all 25 levels'},
+  // Per-level achievements (level field = 0-based index)
+  {id:'lvl_01',icon:'🌟',name:'Star Rookie',  desc:'3 stars · level 1',  level:0,  req:'stars3'},
+  {id:'lvl_02',icon:'🪐',name:'Orbit Pro',    desc:'3 stars · level 2',  level:1,  req:'stars3'},
+  {id:'lvl_03',icon:'🎯',name:'Precise',      desc:'1 shot · level 3',   level:2,  req:'shot1'},
+  {id:'lvl_04',icon:'🚀',name:'Booster Ace',  desc:'1 shot · level 4',   level:3,  req:'shot1'},
+  {id:'lvl_05',icon:'💫',name:'Full Boost',   desc:'3 stars · level 5',  level:4,  req:'stars3'},
+  {id:'lvl_06',icon:'🪞',name:'Wall Ace',     desc:'1 shot · level 6',   level:5,  req:'shot1'},
+  {id:'lvl_07',icon:'🔵',name:'Mirror Shot',  desc:'3 stars · level 7',  level:6,  req:'stars3'},
+  {id:'lvl_08',icon:'🌀',name:'Portal Ace',   desc:'1 shot · level 8',   level:7,  req:'shot1'},
+  {id:'lvl_09',icon:'✨',name:'Dimension',    desc:'3 stars · level 9',  level:8,  req:'stars3'},
+  {id:'lvl_10',icon:'🔄',name:'Anti-Gravity', desc:'beat level 10',       level:9,  req:'any'},
+  {id:'lvl_11',icon:'🌌',name:'Three Body',   desc:'3 stars · level 11', level:10, req:'stars3'},
+  {id:'lvl_12',icon:'💍',name:'Ring World',   desc:'1 shot · level 12',  level:11, req:'shot1'},
+  {id:'lvl_13',icon:'⚖️',name:'Quad Pull',    desc:'3 stars · level 13', level:12, req:'stars3'},
+  {id:'lvl_14',icon:'⚡',name:'Swiss Shot',   desc:'1 shot · level 14',  level:13, req:'shot1'},
+  {id:'lvl_15',icon:'🛸',name:'All Tools',    desc:'3 stars · level 15', level:14, req:'stars3'},
+  {id:'lvl_16',icon:'🎰',name:'Trifecta',     desc:'1 shot · level 16',  level:15, req:'shot1'},
+  {id:'lvl_17',icon:'🧱',name:'Maze Solver',  desc:'3 stars · level 17', level:16, req:'stars3'},
+  {id:'lvl_18',icon:'🎯',name:'Wall Wizard',  desc:'1 shot · level 18',  level:17, req:'shot1'},
+  {id:'lvl_19',icon:'🏛️',name:'Labyrinth',    desc:'3 stars · level 19', level:18, req:'stars3'},
+  {id:'lvl_20',icon:'⚫',name:'Hole in One',  desc:'1 shot · level 20',  level:19, req:'shot1'},
+  {id:'lvl_21',icon:'🌑',name:'Twin Holes',   desc:'3 stars · level 21', level:20, req:'stars3'},
+  {id:'lvl_22',icon:'🌀',name:'Chaos Pilot',  desc:'beat level 22',       level:21, req:'any'},
+  {id:'lvl_23',icon:'🚀',name:'Frontier Ace', desc:'1 shot · level 23',  level:22, req:'shot1'},
+  {id:'lvl_24',icon:'🌟',name:'Almost...',    desc:'3 stars · level 24', level:23, req:'stars3'},
+  {id:'lvl_25',icon:'👑',name:'Galaxy Legend',desc:'beat level 25',       level:24, req:'any'},
+  // Daily challenge
+  {id:'daily_ace',icon:'📅',name:'Daily Ace',desc:'Complete a daily challenge'},
 ];
 
 const Achievements=(()=>{
@@ -1106,6 +1242,12 @@ const Achievements=(()=>{
         if(levelIdx===24){
           if(GameState.levelProgress.every(p=>p>=1)) _unlock('master_sling');
         }
+        // Per-level achievement
+        const lvlAch=ACHIEVEMENT_DEFS.find(a=>a.level===levelIdx);
+        if(lvlAch){
+          const ok=lvlAch.req==='stars3'?stars>=3:lvlAch.req==='shot1'?attemptsUsed===1:true;
+          if(ok)_unlock(lvlAch.id);
+        }
       }
       // Endless mode score milestone
       if(isEndless&&endlessScore>=500) _unlock('endless_drifter');
@@ -1127,7 +1269,8 @@ const Achievements=(()=>{
     },
 
     get unlocked(){return _unlocked;},
-    getAll(){return ACHIEVEMENT_DEFS.map(d=>({...d,earned:_unlocked.has(d.id)}));}
+    getAll(){return ACHIEVEMENT_DEFS.map(d=>({...d,earned:_unlocked.has(d.id)}));},
+    _unlock(id){_unlock(id);}
   };
 })();
 
@@ -1284,6 +1427,103 @@ const LaunchTimer={
     ctx.fillText(Math.ceil(this.remaining),x,y);
     ctx.shadowBlur=0;
     ctx.restore();
+  }
+};
+
+// ── SPEED RUN ─────────────────────────────────────────────
+const SpeedRun={
+  active:false,elapsed:0,_best:+localStorage.getItem('astro_sr_best')||0,
+  get best(){return this._best;},
+  start(){this.active=true;this.elapsed=0;},
+  stop(){this.active=false;},
+  update(dt){if(this.active&&GameState.playing&&!GameState.paused)this.elapsed+=dt;},
+  saveBest(){
+    const improved=!this._best||this.elapsed<this._best;
+    if(improved){this._best=this.elapsed;localStorage.setItem('astro_sr_best',this.elapsed);}
+    return improved;
+  },
+  fmt(t){const m=Math.floor(t/60),s=Math.floor(t%60),ms=Math.floor((t%1)*100);
+    return`${m}:${String(s).padStart(2,'0')}.${String(ms).padStart(2,'0')}`;},
+  draw(ctx){
+    if(!this.active||!GameState.playing||GameState.paused)return;
+    ctx.save();
+    ctx.font="bold 15px 'Fredoka One',sans-serif";ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillStyle='rgba(255,255,255,0.85)';ctx.shadowColor='#00ccff';ctx.shadowBlur=8;
+    ctx.fillText('⏱ '+this.fmt(this.elapsed),W/2,12);
+    ctx.shadowBlur=0;ctx.restore();
+  }
+};
+
+// ── SEEDED RNG (Mulberry32) ────────────────────────────────
+function seededRand(seed){
+  return function(){
+    seed|=0;seed=seed+0x6D2B79F5|0;
+    let t=Math.imul(seed^seed>>>15,1|seed);
+    t=t+Math.imul(t^t>>>7,61|t)^t;
+    return((t^t>>>14)>>>0)/4294967296;
+  };
+}
+
+// ── DAILY CHALLENGE ───────────────────────────────────────
+const DailyChallenge={
+  MODIFIERS:['1_shot','rush_5s','2_shots','dark'],
+  MOD_LABELS:{'1_shot':'Only 1 shot!','rush_5s':'5s launch timer','2_shots':'Only 2 shots!','dark':'Lights out!'},
+  _today(){const d=new Date();return`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;},
+  _seed(){return parseInt(this._today().replace(/-/g,''),10);},
+  done(){return!!localStorage.getItem('astro_daily_'+this._today());},
+  markDone(){localStorage.setItem('astro_daily_'+this._today(),'1');},
+  getModifier(){const r=seededRand(this._seed());return this.MODIFIERS[Math.floor(r()*this.MODIFIERS.length)];},
+  getLevelIdx(){const r=seededRand(this._seed()+1);return Math.floor(r()*LEVELS.length);},
+  start(){
+    const mod=this.getModifier();const lvl=this.getLevelIdx();
+    if(mod==='rush_5s')LaunchTimer.TIME=5;
+    if(mod==='1_shot')GameState._dailyMaxShots=1;
+    if(mod==='2_shots')GameState._dailyMaxShots=2;
+    if(mod==='dark')document.body.classList.add('daily-dark');
+    GameState.daily=true;GameState.dailyMod=mod;
+    this._showCard(mod,lvl,()=>GameState.startLevel(lvl));
+  },
+  _showCard(mod,lvl,cb){
+    const el=document.createElement('div');
+    el.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(2,0,18,.92);backdrop-filter:blur(18px);';
+    el.innerHTML=`
+      <div style="font-size:52px;margin-bottom:12px">📅</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:26px;color:#fff;letter-spacing:1px;margin-bottom:6px">DAILY CHALLENGE</div>
+      <div style="font-size:13px;color:rgba(200,180,255,.55);letter-spacing:3px;text-transform:uppercase;margin-bottom:24px">LEVEL ${lvl+1}</div>
+      <div style="background:rgba(120,60,255,.18);border:1px solid rgba(120,80,255,.35);border-radius:14px;padding:14px 28px;text-align:center;margin-bottom:28px">
+        <div style="font-size:22px;margin-bottom:4px">${mod==='1_shot'?'🎯':mod==='rush_5s'?'⚡':mod==='2_shots'?'🎯':'🌑'}</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">${this.MOD_LABELS[mod]}</div>
+      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,.3);letter-spacing:2px">GET READY…</div>`;
+    document.body.appendChild(el);
+    setTimeout(()=>{
+      el.style.transition='opacity .4s';el.style.opacity='0';
+      setTimeout(()=>{el.remove();cb();},420);
+    },2400);
+  },
+  finish(won){
+    LaunchTimer.TIME=10;
+    delete GameState._dailyMaxShots;
+    GameState.daily=false;GameState.dailyMod=null;
+    document.body.classList.remove('daily-dark');
+    GameState.playing=false;GameState.paused=false;
+    if(won){this.markDone();Achievements._unlock('daily_ace');}
+    const el=document.createElement('div');
+    el.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(2,0,18,.92);backdrop-filter:blur(18px);';
+    el.innerHTML=won?`
+      <div style="font-size:52px;margin-bottom:12px">🏆</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:26px;color:#fff;margin-bottom:8px">CHALLENGE COMPLETE!</div>
+      <div style="font-size:13px;color:rgba(200,255,180,.7);letter-spacing:2px">Come back tomorrow for a new one!</div>
+    `:`
+      <div style="font-size:52px;margin-bottom:12px">💫</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:26px;color:#fff;margin-bottom:8px">SO CLOSE!</div>
+      <div style="font-size:13px;color:rgba(200,180,255,.55);letter-spacing:2px">Try again or come back tomorrow</div>
+    `;
+    document.body.appendChild(el);
+    setTimeout(()=>{
+      el.style.transition='opacity .4s';el.style.opacity='0';
+      setTimeout(()=>{el.remove();showScreen('titleScreen');},420);
+    },2400);
   }
 };
 
@@ -1737,6 +1977,7 @@ class Ship{
   drawShip(ctx,x,y,angle,scale=1,alpha=1){
     ctx.save();
     try{
+    const sk=SkinManager.current();
     ctx.translate(x,y);ctx.rotate(angle);ctx.scale(scale,scale);ctx.globalAlpha=alpha;
     const ep=0.5+0.5*Math.sin(this.enginePulse||0);
 
@@ -1762,7 +2003,7 @@ class Ship{
 
     // ── LEFT WING  (swept delta, -y side) ────────────────────
     // Sharp angular retro shape — root at body, tip swept far back
-    ctx.fillStyle='#1a3566';ctx.shadowBlur=0;
+    ctx.fillStyle=sk.wing;ctx.shadowBlur=0;
     ctx.beginPath();
     ctx.moveTo(8,-4);       // leading root (joins body)
     ctx.lineTo(-5,-4);      // inner mid
@@ -1777,7 +2018,7 @@ class Ship{
     ctx.beginPath();ctx.moveTo(8,-4);ctx.lineTo(-5,-4);ctx.lineTo(-17,-23);ctx.closePath();ctx.fill();
 
     // ── RIGHT WING (mirror) ──────────────────────────────────
-    ctx.fillStyle='#1a3566';
+    ctx.fillStyle=sk.wing;
     ctx.beginPath();
     ctx.moveTo(8,4);ctx.lineTo(-5,4);ctx.lineTo(-19,26);ctx.lineTo(-12,8);ctx.closePath();ctx.fill();
     ctx.strokeStyle='rgba(60,160,255,0.65)';ctx.lineWidth=1.2;
@@ -1787,8 +2028,8 @@ class Ship{
 
     // ── MAIN FUSELAGE ────────────────────────────────────────
     const bg=ctx.createLinearGradient(-20,0,22,0);
-    bg.addColorStop(0,'#0e1e3a');bg.addColorStop(0.25,'#1e3e70');
-    bg.addColorStop(0.6,'#3a70bb');bg.addColorStop(0.88,'#5a9ade');bg.addColorStop(1,'#80bef8');
+    bg.addColorStop(0,sk.body1);bg.addColorStop(0.25,'#1e3e70');
+    bg.addColorStop(0.6,'#3a70bb');bg.addColorStop(0.88,'#5a9ade');bg.addColorStop(1,sk.body2);
     ctx.fillStyle=bg;ctx.shadowColor='rgba(60,140,255,0.45)';ctx.shadowBlur=10;
     ctx.beginPath();
     ctx.moveTo(22,0);         // nose tip
@@ -1832,7 +2073,7 @@ class Ship{
     ctx.beginPath();ctx.moveTo(6,7.5);ctx.lineTo(-11,5.5);ctx.stroke();    // lower panel
 
     // ── RETRO COLOR STRIPE (orange/yellow accent band) ───────
-    ctx.strokeStyle='rgba(255,190,40,0.7)';ctx.lineWidth=1.6;
+    ctx.strokeStyle=sk.stripe;ctx.lineWidth=1.6;
     ctx.beginPath();ctx.moveTo(2,-7.5);ctx.lineTo(-11,-5.5);ctx.stroke();
     ctx.beginPath();ctx.moveTo(2,7.5);ctx.lineTo(-11,5.5);ctx.stroke();
 
@@ -1848,7 +2089,7 @@ class Ship{
 
     // ── SHIELD GLOW (ambient hull light) ─────────────────────
     const sg=ctx.createRadialGradient(4,0,6,4,0,26);
-    sg.addColorStop(0,'rgba(50,130,255,0.14)');sg.addColorStop(1,'rgba(0,0,0,0)');
+    sg.addColorStop(0,sk.shield);sg.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=sg;ctx.beginPath();ctx.arc(4,0,26,0,Math.PI*2);ctx.fill();
 
     }finally{ctx.restore();}
@@ -2531,11 +2772,15 @@ const GameState={
     this.levelProgress[0]=Math.max(this.levelProgress[0],1);
     this.endlessBest=parseInt(localStorage.getItem('cosmo_best')||'0');
     this._totalStars=0;
-    Achievements.init();
+    Achievements.init();SkinManager.init();
   },
   startLevel(idx){
-    this.currentLevelIndex=idx;this.attempts=MAX_ATTEMPTS;this.starsCollected=0;
+    this.currentLevelIndex=idx;
+    this.attempts=this._dailyMaxShots||MAX_ATTEMPTS;
+    this._attemptsMax=this.attempts;
+    this.starsCollected=0;
     this.playing=true;this.paused=false;this.endless=false;
+    if(SpeedRun.active&&idx===0)SpeedRun.start();
     PhysicsEngine.reset(LEVELS[idx]);
     // Hide all screens and bg canvas, show HUD
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -2563,6 +2808,7 @@ const GameState={
     if(this.attempts<=0){
       this.playing=false;
       setTimeout(()=>{
+        if(this.daily){DailyChallenge.finish(false);return;}
         if(this.endless){
           if(this.endlessScore>this.endlessBest){this.endlessBest=this.endlessScore;localStorage.setItem('cosmo_best',this.endlessBest);}
           document.getElementById('endlessScore').textContent=this.endlessScore;
@@ -2580,7 +2826,9 @@ const GameState={
   },
   onLevelWin(){
     this.playing=false;const stars=this.starsCollected;
-    const attemptsUsed=MAX_ATTEMPTS-this.attempts+1; // shots fired this level
+    const attemptsUsed=(this._attemptsMax||MAX_ATTEMPTS)-this.attempts+1;
+    // Daily challenge intercept
+    if(this.daily){setTimeout(()=>DailyChallenge.finish(true),600);return;}
     setTimeout(()=>{
       if(this.endless){
         this.endlessScore+=100+stars*50;
@@ -2607,13 +2855,21 @@ const GameState={
           LevelTransition.play(stars,pts,isLast,()=>{
             document.getElementById('winStars').textContent=['','⭐','⭐⭐','⭐⭐⭐'][clamp(stars,0,3)]||'🌙';
             document.getElementById('winScore').textContent=`+${pts} PTS`;
+            // SpeedRun finish on last level
+            const srEl=document.getElementById('winSpeedRunTime');
+            if(isLast&&SpeedRun.active){
+              const elapsed=SpeedRun.elapsed;
+              const improved=SpeedRun.saveBest();SpeedRun.stop();
+              if(srEl)srEl.textContent=(improved?'🏆 NEW BEST: ':'⏱ TIME: ')+SpeedRun.fmt(elapsed);
+              if(srEl)srEl.style.display='block';
+            }else{if(srEl)srEl.style.display='none';}
             showScreen('winScreen');
           });
         };
 
-        // Show ad every 3 levels (if not purchased)
+        // Show interstitial ad every 3 levels (via AdMob, if not purchased)
         if(AdManager.onLevelComplete()){
-          AdManager.show(doTransition);
+          AdManager.showInterstitial().finally(doTransition);
         } else {
           doTransition();
         }
@@ -2639,7 +2895,7 @@ const GameState={
       }
     }
     if(this._hLvl) this._hLvl.textContent=this.endless?`SCORE: ${this.endlessScore}`:`LEVEL ${this.currentLevelIndex+1}`;
-    if(this._hTxt) this._hTxt.textContent=`SHOTS LEFT: ${this.attempts}/${MAX_ATTEMPTS}`;
+    if(this._hTxt) this._hTxt.textContent=`SHOTS LEFT: ${this.attempts}/${this._attemptsMax||MAX_ATTEMPTS}`;
     if(this._hDots) this._hDots.forEach((d,i)=>{d.className='attempt-dot'+(i>=this.attempts?' used':'');});
   },
   pause() {if(!this.playing)return;this.paused=true;const m=document.getElementById('inGameMenu');if(m){document.getElementById('igmLevel').textContent=`LEVEL ${this.currentLevelIndex+1}`;m.classList.add('active');}},
@@ -2663,6 +2919,11 @@ function showScreen(id){
     if(el)el.classList.add('active');
   }
   if(id==='titleScreen'||id==='menuScreen'||id==='levelScreen')Music.play(0);
+  if(id==='titleScreen'){
+    const db=document.getElementById('dailyBtn');
+    if(db)db.textContent=DailyChallenge.done()?'📅 DAILY — DONE ✓':'📅 DAILY CHALLENGE';
+  }
+  ctx.clearRect(0,0,W,H);
 }
 
 function buildLevelGrid(){
@@ -2690,18 +2951,26 @@ function gameLoop(ts){
   requestAnimationFrame(gameLoop);
   if(!GameState.playing||GameState.paused)return;
   Background.update(dt);Shake.update(dt);Particles.update(dt);
-  PhysicsEngine.update(dt);LaunchTimer.update(dt);GameState.updateHUD();
+  PhysicsEngine.update(dt);LaunchTimer.update(dt);SpeedRun.update(dt);GameState.updateHUD();
   ctx.save();ctx.translate(Shake.x,Shake.y);
   Background.draw(ctx);
   PhysicsEngine.draw(ctx);
   Particles.draw(ctx);
   LaunchTimer.draw(ctx);
   ctx.restore();
+  SpeedRun.draw(ctx);
 }
 
 // ── CONTROLLER ────────────────────────────────────────────
 const Game={
-  showTitle()      {showScreen('titleScreen');},
+  showTitle(){
+    // Close any stale modals/overlays before showing title so they can't block buttons
+    ['skinModal','purchaseModal','achievementsModal','aboutModal'].forEach(id=>{
+      document.getElementById(id)?.classList.remove('active');
+    });
+    document.getElementById('lvlTransition')?.classList.remove('show');
+    showScreen('titleScreen');
+  },
   showMenu()       {showScreen('menuScreen');AdManager._syncRemoveAdsUI();},
   showLevelSelect(){buildLevelGrid();showScreen('levelScreen');},
   restart()        {GameState.restart();},
@@ -2736,6 +3005,7 @@ const Game={
     const m=document.getElementById('inGameMenu');
     if(m)m.classList.remove('active');
     GameState.playing=false;GameState.paused=false;
+    SpeedRun.stop();
     Music.play(0);
     showScreen('titleScreen');
   },
@@ -2763,9 +3033,102 @@ const Game={
   closeAbout(){
     const m=document.getElementById('aboutModal');
     if(m)m.classList.remove('active');
+    showScreen('titleScreen');
+  },
+
+  showAchievements(){
+    const modal=document.getElementById('achievementsModal');
+    if(!modal)return;
+    const all=Achievements.getAll();
+    const earned=all.filter(a=>a.earned).length;
+    document.getElementById('achModalCount').textContent=`${earned}/${all.length}`;
+    const body=document.getElementById('achModalBody');
+    body.innerHTML='';
+    // General challenges section
+    const general=all.filter(a=>a.level===undefined);
+    const lbl1=document.createElement('div');lbl1.className='ach-section-lbl';lbl1.textContent='Challenges';
+    body.appendChild(lbl1);
+    general.forEach(a=>{
+      const row=document.createElement('div');
+      row.className='ach-row '+(a.earned?'earned':'locked');
+      row.innerHTML=`<span class="ach-row-icon">${a.earned?a.icon:'🔒'}</span><div><div class="ach-row-name">${a.name}</div><div class="ach-row-desc">${a.desc}</div></div>`;
+      body.appendChild(row);
+    });
+    // Per-level section
+    const levels=all.filter(a=>a.level!==undefined).sort((a,b)=>a.level-b.level);
+    const lbl2=document.createElement('div');lbl2.className='ach-section-lbl';lbl2.textContent='Levels';
+    body.appendChild(lbl2);
+    levels.forEach(a=>{
+      const row=document.createElement('div');
+      row.className='ach-row '+(a.earned?'earned':'locked');
+      row.innerHTML=`<span class="ach-row-icon">${a.earned?a.icon:'🔒'}</span><div><div class="ach-row-name">${a.name}</div><div class="ach-row-desc">${a.desc}</div></div>`;
+      body.appendChild(row);
+    });
+    modal.classList.add('active');
+  },
+  closeAchievements(){
+    const m=document.getElementById('achievementsModal');
+    if(m)m.classList.remove('active');
+    showScreen('titleScreen');
   },
 
   showRemoveAds(){AdManager.purchaseRemoveAds();AdManager._syncRemoveAdsUI();},
+
+  showSkins(){
+    const modal=document.getElementById('skinModal');
+    if(!modal)return;
+    const grid=document.getElementById('skinGrid');
+    if(grid){
+      grid.innerHTML='';
+      SKIN_DEFS.forEach(skin=>{
+        const unlocked=SkinManager.unlocked(skin);
+        const selected=SkinManager._sel===skin.id;
+        const card=document.createElement('div');
+        card.className='skin-card'+(selected?' selected':'')+(unlocked?'':' locked');
+        // Color swatch showing wing + body gradient
+        card.innerHTML=`<canvas class="skin-swatch" width="52" height="30"></canvas><div class="skin-name">${unlocked?skin.name:'🔒 '+skin.name}</div>${unlocked?'':`<div class="skin-lock">${skin.hint}</div>`}`;
+        if(unlocked){
+          card.onclick=()=>{SkinManager.select(skin.id);this.showSkins();};
+          // Draw swatch on canvas
+          const cv=card.querySelector('canvas');
+          const c=cv.getContext('2d');
+          const g=c.createLinearGradient(0,0,52,0);
+          g.addColorStop(0,skin.body1);g.addColorStop(1,skin.body2);
+          c.fillStyle=g;c.fillRect(0,0,52,30);
+          c.fillStyle=skin.wing;c.fillRect(0,0,16,30);
+          // Stripe accent
+          c.strokeStyle=skin.stripe;c.lineWidth=2;
+          c.beginPath();c.moveTo(10,8);c.lineTo(45,8);c.stroke();
+          c.beginPath();c.moveTo(10,22);c.lineTo(45,22);c.stroke();
+        }
+        grid.appendChild(card);
+      });
+    }
+    modal.classList.add('active');
+  },
+  hideSkins(){
+    const modal=document.getElementById('skinModal');
+    if(modal)modal.classList.remove('active');
+    showScreen('titleScreen');
+  },
+
+  startSpeedRun(){
+    SpeedRun.active=true;
+    this.startFirstLevel(null);
+  },
+
+  startDailyChallenge(){
+    if(DailyChallenge.done()){
+      // Show toast
+      const t=document.createElement('div');
+      t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(40,20,80,.95);border:1px solid rgba(120,80,255,.4);border-radius:12px;padding:10px 20px;font-family:\'Fredoka One\',cursive;font-size:14px;color:#fff;z-index:9999;pointer-events:none;';
+      t.textContent='Come back tomorrow! 📅';
+      document.body.appendChild(t);
+      setTimeout(()=>{t.style.transition='opacity .4s';t.style.opacity='0';setTimeout(()=>t.remove(),420);},2000);
+      return;
+    }
+    DailyChallenge.start();
+  },
 
   toggleAllAudio(){
     const nowMuted=!(Audio.sfxMuted&&Music.muted);
@@ -2946,6 +3309,7 @@ window.addEventListener('resize',scaleBgCanvas);
   // ── Draw the retro arcade ship (same design as in-game) ──
   function drawShip(x,y,angle,scale){
     c.save();
+    const sk=SkinManager.current();
     c.translate(x,y);c.rotate(angle);c.scale(scale,scale);
 
     // Engine plume
@@ -2969,7 +3333,7 @@ window.addEventListener('resize',scaleBgCanvas);
     c.shadowColor='#00ffff';c.shadowBlur=14;
 
     // Wings
-    c.fillStyle='#0a1a3a';
+    c.fillStyle=sk.wing;
     c.beginPath();c.moveTo(5,-3);c.lineTo(-10,-3);c.lineTo(-12,-14);c.closePath();c.fill();
     c.beginPath();c.moveTo(5,3);c.lineTo(-10,3);c.lineTo(-12,14);c.closePath();c.fill();
     // Wing neon edge
@@ -2979,7 +3343,7 @@ window.addEventListener('resize',scaleBgCanvas);
 
     // Fuselage
     const bg=c.createLinearGradient(-12,0,14,0);
-    bg.addColorStop(0,'#0a1830');bg.addColorStop(.5,'#1a4080');bg.addColorStop(1,'#2060b0');
+    bg.addColorStop(0,sk.body1);bg.addColorStop(.5,'#1a4080');bg.addColorStop(1,sk.body2);
     c.fillStyle=bg;c.shadowColor='#00cfff';c.shadowBlur=10;
     c.beginPath();
     c.moveTo(14,0);c.lineTo(10,-4);c.lineTo(-10,-4);c.lineTo(-12,0);c.lineTo(-10,4);c.lineTo(10,4);
@@ -2998,7 +3362,7 @@ window.addEventListener('resize',scaleBgCanvas);
     c.beginPath();c.ellipse(6.5,-1,2.5,1.5,0,0,Math.PI*2);c.fill();
 
     // Neon stripe
-    c.strokeStyle='#ff00ff';c.lineWidth=.9;c.shadowColor='#ff00ff';c.shadowBlur=8;
+    c.strokeStyle=sk.stripe;c.lineWidth=.9;c.shadowColor=sk.stripe;c.shadowBlur=8;
     c.beginPath();c.moveTo(-2,-4);c.lineTo(-9,-4);c.stroke();
     c.beginPath();c.moveTo(-2,4);c.lineTo(-9,4);c.stroke();
 
@@ -3209,10 +3573,8 @@ document.addEventListener('touchstart',_acUnlock,{once:true});
 document.addEventListener('mousedown',_acUnlock,{once:true});
 // Start menu music after tiny delay so AC can init
 setTimeout(()=>Music.play(0),400);
-// ATT prompt (Apple App Tracking Transparency)
-ATT.init();
-// Sync Remove Ads button state
-AdManager._syncRemoveAdsUI();
+// Initialize AdMob + IAP (handles ATT prompt automatically on iOS 14+)
+AdManager.init();
 requestAnimationFrame(ts=>{lastTime=ts;requestAnimationFrame(gameLoop);});
 </script>
 </body>

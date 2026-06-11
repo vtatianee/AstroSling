@@ -27,8 +27,11 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{overflow:hidden;height:100%;}
   body{background:#04000e;display:flex;justify-content:center;align-items:center;height:100vh;overflow:hidden;font-family:'Nunito',sans-serif;touch-action:none;user-select:none;}
-  #gameContainer{position:relative;width:390px;height:844px;overflow:hidden;border-radius:14px;z-index:1;
+  /* Keep the 390:844 design aspect but fill as much of the screen as possible
+     (phones ≈ fullscreen; tablets get a tall centered stage instead of a tiny frame) */
+  #gameContainer{position:relative;width:min(100vw,100vh*0.46209);height:min(100vh,100vw*2.16410);overflow:hidden;border-radius:14px;z-index:1;
     box-shadow:0 0 0 1px rgba(120,60,255,0.25),0 0 40px rgba(100,40,220,0.45),0 0 100px rgba(60,20,160,0.35);}
   /* Only the main game canvas fills the container */
   #gameCanvas{display:block;width:100%;height:100%;position:absolute;inset:0;z-index:0;}
@@ -73,7 +76,7 @@
   #levelScreen{background:radial-gradient(ellipse at 50% 20%,rgba(10,40,120,.45) 0%,transparent 55%),linear-gradient(180deg,#040018 0%,#020010 100%);padding:0;overflow-y:auto;justify-content:flex-start;padding-top:64px;}
   .galaxy-label{font-family:'Fredoka One',cursive;font-size:10px;color:rgba(100,180,255,.55);letter-spacing:4px;text-transform:uppercase;margin:16px 0 8px;grid-column:1/-1;display:flex;align-items:center;gap:8px;}
   .galaxy-label::before,.galaxy-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(100,160,255,.28),transparent);}
-  .level-btn{aspect-ratio:1;border-radius:14px;color:#fff;font-family:'Fredoka One',cursive;font-size:19px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  .level-btn{height:76px;border-radius:14px;color:#fff;font-family:'Fredoka One',cursive;font-size:19px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
     transition:transform .12s,box-shadow .12s;pointer-events:all;position:relative;overflow:hidden;border:1.5px solid rgba(255,255,255,.07);background:rgba(255,255,255,.04);}
   .level-btn::before{content:'';position:absolute;inset:0;border-radius:14px;background:linear-gradient(145deg,rgba(255,255,255,.07) 0%,transparent 60%);pointer-events:none;}
   .level-btn:active{transform:scale(.9);}
@@ -781,13 +784,9 @@ const ctx=canvas.getContext('2d');
 const W=390,H=844;
 canvas.width=W;canvas.height=H;
 
-function scaleGame(){
-  const vw=window.innerWidth,vh=window.innerHeight,s=Math.min(vw/W,vh/H);
-  const c=document.getElementById('gameContainer');
-  c.style.transform=`scale(${s})`;c.style.transformOrigin='center center';
-  c.style.left=((vw-W*s)/2)+'px';c.style.top=((vh-H*s)/2)+'px';c.style.position='absolute';
-}
-window.addEventListener('resize',scaleGame);scaleGame();
+// Container sizing is handled in CSS (#gameContainer width/height min()
+// keeps the 390:844 aspect and fills the screen; body flex centers it).
+// The old transform-scale approach double-scaled on top of that CSS.
 
 // ── AUDIO (SFX) ──────────────────────────────────────────
 const Audio=(()=>{

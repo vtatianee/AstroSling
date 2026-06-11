@@ -598,6 +598,7 @@
         <div class="purchase-perk">Restored automatically on reinstall</div>
       </div>
       <button class="purchase-confirm" onclick="AdManager.confirmPurchase()">BUY FOR $2.99</button>
+      <button class="btn btn-ghost btn-sm" style="margin-top:10px;font-size:13px" onclick="AdManager.restorePurchases()">Restore Purchases</button>
       <div class="purchase-cancel" onclick="AdManager.cancelPurchase()">No thanks</div>
     </div>
   </div>
@@ -665,13 +666,13 @@
       <div class="about-section">
         <h3>✉️ Contact & Support</h3>
         <p>Questions, feedback or bug reports:</p>
-        <a href="mailto:support@astrosling.app">support@astrosling.app</a>
+        <a href="mailto:arche.boost@gmail.com">arche.boost@gmail.com</a>
         <p style="margin-top:8px">Response time: within 5 business days.</p>
       </div>
       <div class="about-section">
         <h3>⚖️ Legal</h3>
         <p>© 2026 AstroSling. All rights reserved.</p>
-        <a href="https://cosmosling.app/privacy" target="_blank" style="margin-top:6px">Privacy Policy ↗</a>
+        <a href="https://vtatianee.github.io/AstroSling/privacy.html" target="_blank" style="margin-top:6px">Privacy Policy ↗</a>
         <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" target="_blank" style="margin-top:4px">Terms of Use (EULA) ↗</a>
       </div>
     </div>
@@ -984,63 +985,136 @@ const Music=(()=>{
 })();
 
 // ── ATT — Apple App Tracking Transparency ─────────────────
-// In production (Capacitor): replace with @capacitor-community/app-tracking-transparency
-// requestTrackingAuthorization() from the plugin
+// Handled automatically by @capacitor-community/admob when initialized
+// with requestTrackingAuthorization:true. No custom modal needed.
 const ATT={
-  _key:'cosmo_att',
-  init(){
-    if(localStorage.getItem(this._key))return; // already asked
-    setTimeout(()=>{
-      const el=document.getElementById('attModal');
-      if(el){el.classList.add('active');}
-    },1200); // show 1.2s after launch
-  },
-  respond(allow){
-    localStorage.setItem(this._key, allow?'granted':'denied');
-    const el=document.getElementById('attModal');
-    if(el){el.style.opacity='0';setTimeout(()=>el.classList.remove('active'),300);}
-    // In Capacitor: AppTrackingTransparency.requestPermission() returns the status
-    // You can then pass it to AdMob: AdMob.setApplicationMuted(!allow)
-    console.log('ATT response:', allow?'Authorized':'Denied');
-  }
+  // ATT prompt is triggered by AdMob.initialize() on iOS 14+.
+  // The #attModal HTML is kept for web-preview purposes but hidden on native.
 };
 
 // ── AD MANAGER ─────────────────────────────────────────────
-// Shows interstitial every 3 levels. Integrates with Google AdMob via Capacitor.
-// Real integration: import { AdMob, InterstitialAdPluginEvents } from '@capacitor-community/admob'
-// AdMob.prepareInterstitial({ adId: 'ca-app-pub-XXXXX/YYYYY' })
-// AdMob.showInterstitial()
+// Interstitial every 3 levels via @capacitor-community/admob.
+// IAP (Remove Ads, $2.99) via cordova-plugin-purchase (CdvPurchase).
+//
+// ⚠️  Replace placeholder IDs before App Store submission:
+//   ADMOB_APP_ID   → your real AdMob App ID (Info.plist GADApplicationIdentifier)
+//   INTERSTITIAL_ID → your real Interstitial Ad Unit ID
+//   PRODUCT_ID      → com.arche.astrosling.removeads (configured in App Store Connect)
 const AdManager={
-  _noAdsKey:'cosmo_noads',
+  _noAdsKey:'astro_noads',
   _levelCount:0,
-  _skipTimer:null,
-  _cb:null,
+  _initialized:false,
+  PRODUCT_ID:'com.arche.astrosling.removeads',
+  // Test interstitial ID — replace with real ID before release
+  INTERSTITIAL_ID:'ca-app-pub-3940256099942544/4411468910',
 
   get noAds(){return localStorage.getItem(this._noAdsKey)==='1';},
 
-  purchaseRemoveAds(){
-    // Show the in-game purchase modal
-    const m=document.getElementById('purchaseModal');
-    if(m) m.classList.add('active');
+  // ── Initialize AdMob + IAP on app start ──
+  async init(){
+    this._syncRemoveAdsUI();
+    const isNative=window.Capacitor?.isNativePlatform();
+
+    // ── AdMob ──
+    if(isNative && !this.noAds){
+      try{
+        const {AdMob}=Capacitor.Plugins;
+        if(AdMob){
+          await AdMob.initialize({
+            requestTrackingAuthorization:true, // triggers ATT prompt on iOS 14+
+            initializeForTesting:false,
+          });
+          this._initialized=true;
+        }
+      }catch(e){console.warn('AdMob init error:',e);}
+    }
+
+    // ── In-App Purchase (cordova-plugin-purchase / CdvPurchase) ──
+    if(isNative && window.CdvPurchase){
+      const {store,ProductType,Platform}=CdvPurchase;
+      store.register([{
+        id:this.PRODUCT_ID,
+        type:ProductType.NON_CONSUMABLE,
+        platform:Platform.APPLE_APPSTORE,
+      }]);
+      store.when().approved(transaction=>{
+        transaction.verify();
+      });
+      store.when().verified(receipt=>{
+        receipt.finish();
+        this._grantNoAds();
+      });
+      store.initialize([Platform.APPLE_APPSTORE]);
+    }
   },
 
-  confirmPurchase(){
-    // In production: replace with StoreKit (iOS) via Capacitor
-    // import { InAppPurchase2 } from '@ionic-native/in-app-purchase-2'
-    // store.register({ id:'com.cosmosling.removeads', type: store.NON_CONSUMABLE })
-    // store.order('com.cosmosling.removeads')
-    localStorage.setItem(this._noAdsKey,'1');
-    const m=document.getElementById('purchaseModal');
-    if(m)m.classList.remove('active');
-    this._syncRemoveAdsUI();
-    // Show success toast
-    const t=document.getElementById('purchaseToast');
-    if(t){t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+  // ── Show interstitial (called after every 3rd level) ──
+  async showInterstitial(){
+    if(this.noAds||!this._initialized)return;
+    try{
+      const {AdMob}=Capacitor.Plugins;
+      await AdMob.prepareInterstitial({adId:this.INTERSTITIAL_ID});
+      await AdMob.showInterstitial();
+    }catch(e){console.warn('AdMob interstitial error:',e);}
   },
+
+  // ── Called from onLevelWin() ──
+  onLevelComplete(){
+    this._levelCount++;
+    if(this.noAds)return false;
+    if(this._levelCount%3!==0)return false;
+    return true;
+  },
+
+  // ── Purchase modal ──
+  purchaseRemoveAds(){
+    const m=document.getElementById('purchaseModal');
+    if(m)m.classList.add('active');
+  },
+
+  // ── Trigger real StoreKit purchase ──
+  async confirmPurchase(){
+    const isNative=window.Capacitor?.isNativePlatform();
+    if(!isNative){
+      // Dev/browser mode: simulate purchase
+      this._grantNoAds();
+      const m=document.getElementById('purchaseModal');
+      if(m)m.classList.remove('active');
+      return;
+    }
+    try{
+      const {store}=CdvPurchase;
+      const product=store.get(this.PRODUCT_ID);
+      if(product)await store.order(product);
+    }catch(e){
+      console.warn('IAP purchase error:',e);
+    }
+  },
+
+  // ── Restore previous purchases (Apple requires this button) ──
+  async restorePurchases(){
+    const isNative=window.Capacitor?.isNativePlatform();
+    if(!isNative)return;
+    try{
+      const {store,Platform}=CdvPurchase;
+      await store.restorePurchases();
+    }catch(e){console.warn('Restore error:',e);}
+  },
+
   cancelPurchase(){
     const m=document.getElementById('purchaseModal');
     if(m)m.classList.remove('active');
   },
+
+  _grantNoAds(){
+    localStorage.setItem(this._noAdsKey,'1');
+    this._syncRemoveAdsUI();
+    const m=document.getElementById('purchaseModal');
+    if(m)m.classList.remove('active');
+    const t=document.getElementById('purchaseToast');
+    if(t){t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+  },
+
   _syncRemoveAdsUI(){
     const noAds=this.noAds;
     const label=noAds?'✅ ADS REMOVED':'⭐ REMOVE ADS — $2.99';
@@ -1052,47 +1126,6 @@ const AdManager={
       b.style.pointerEvents=noAds?'none':'all';
     });
   },
-
-  onLevelComplete(){
-    this._levelCount++;
-    if(this.noAds)return false;        // purchased: skip ads
-    if(this._levelCount%3!==0)return false; // only every 3 levels
-    return true;  // show ad
-  },
-
-  show(cb){
-    this._cb=cb;
-    const el=document.getElementById('adOverlay');
-    const btn=document.getElementById('adSkipBtn');
-    const cntEl=document.getElementById('adCountdown');
-    if(!el||!btn)return cb&&cb();
-
-    let secs=5;
-    btn.classList.remove('ready');
-    btn.textContent='SKIP AD';
-    cntEl.textContent=`Skip available in ${secs}s…`;
-    el.classList.add('active');
-
-    clearInterval(this._skipTimer);
-    this._skipTimer=setInterval(()=>{
-      secs--;
-      if(secs<=0){
-        clearInterval(this._skipTimer);
-        btn.textContent='SKIP AD ✕';
-        btn.classList.add('ready');
-        cntEl.textContent='';
-      } else {
-        cntEl.textContent=`Skip available in ${secs}s…`;
-      }
-    },1000);
-  },
-
-  skip(){
-    clearInterval(this._skipTimer);
-    const el=document.getElementById('adOverlay');
-    if(el)el.classList.remove('active');
-    if(this._cb){const f=this._cb;this._cb=null;f();}
-  }
 };
 
 
@@ -2835,9 +2868,9 @@ const GameState={
           });
         };
 
-        // Show ad every 3 levels (if not purchased)
+        // Show interstitial ad every 3 levels (via AdMob, if not purchased)
         if(AdManager.onLevelComplete()){
-          AdManager.show(doTransition);
+          AdManager.showInterstitial().finally(doTransition);
         } else {
           doTransition();
         }
@@ -3541,10 +3574,8 @@ document.addEventListener('touchstart',_acUnlock,{once:true});
 document.addEventListener('mousedown',_acUnlock,{once:true});
 // Start menu music after tiny delay so AC can init
 setTimeout(()=>Music.play(0),400);
-// ATT prompt (Apple App Tracking Transparency)
-ATT.init();
-// Sync Remove Ads button state
-AdManager._syncRemoveAdsUI();
+// Initialize AdMob + IAP (handles ATT prompt automatically on iOS 14+)
+AdManager.init();
 requestAnimationFrame(ts=>{lastTime=ts;requestAnimationFrame(gameLoop);});
 </script>
 </body>

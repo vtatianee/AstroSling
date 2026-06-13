@@ -4,7 +4,7 @@ Thank you for reviewing my app. I'd like to explain my situation, because I beli
 
 AstroSling is my first app ever, and it's an original game that I created myself — I designed the concept, all 25 levels, the game mechanics and the visual style, and I developed it with the help of AI coding tools (Claude). It's not a purchased template or anyone else's code repackaged: it was built from scratch for this game, and the entire development history is public on my GitHub if you'd like to verify: https://github.com/vtatianee/AstroSling
 
-I'll be honest: when I submitted, my screenshots were placeholders (one of them was literally just a dark image), and looking back I completely understand how that made my app look like a low-effort submission. That was my mistake and I've fixed it — all screenshots are now real gameplay captures, and I also improved how the game looks on iPad and uploaded a new build (build 3).
+When I submitted, my screenshots were placeholders (one of them was literally just a dark image), and looking back I completely understand how that made my app look like a low-effort submission. That was my mistake and I've fixed it — all screenshots are now real gameplay captures, and I also improved how the game looks on iPad and uploaded a new build (build 3).
 
 About the game itself: it has 25 levels designed one by one, each galaxy introduces a different mechanic (portals, reverse gravity, black holes, reflective walls...), plus a daily challenge, a speed run mode, an endless mode, 37 achievements and unlockable ship skins. Even the music and sound effects are generated procedurally, not taken from asset packs. Nothing in it was copied from another app.
 

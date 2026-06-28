@@ -72,5 +72,7 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSHumanReadableCopyright</key>
+	<string>© 2026 Vanessa Assink</string>
 </dict>
 </plist>

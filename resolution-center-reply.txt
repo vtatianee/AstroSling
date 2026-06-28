@@ -1,15 +1,14 @@
 Hello,
 
-Thank you for reviewing my app. I'd like to explain my situation, because I believe there was a misunderstanding.
+I received the same 4.3(a) rejection again, with no new specifics, so I want to give you concrete evidence that this is original, independently developed work — not a template or repackaged app.
 
-AstroSling is my first app ever, and it's an original game that I created myself — I designed the concept, all 25 levels, the game mechanics and the visual style, and I developed it with the help of AI coding tools (Claude). It's not a purchased template or anyone else's code repackaged: it was built from scratch for this game, and the entire development history is public on my GitHub if you'd like to verify: https://github.com/vtatianee/AstroSling
+The full commit history is public on GitHub: https://github.com/vtatianee/AstroSling
+- First commit: March 15, 2026 (an early prototype, then called "Cosmo Sling")
+- 38 commits over 3 months, evolving the concept, levels, and visuals step by step
+- Every level, mechanic, and asset was designed by me; I used AI coding tools (Claude) to help write the code, the same way many developers use modern tools, but the design and content are mine
 
-When I submitted, my screenshots were placeholders (one of them was literally just a dark image), and looking back I completely understand how that made my app look like a low-effort submission. That was my mistake and I've fixed it — all screenshots are now real gameplay captures, and I also improved how the game looks on iPad and uploaded a new build (build 3).
+I'm asking directly, because your message doesn't say: which specific app(s) on the App Store is AstroSling considered similar to? I have not copied any binary, source code, or assets from another app, purchased a template, or submitted this app under another account. If you can point to the app(s) in question, I can address the specific concern. If it would help, I'm also glad to do a live screen-share or call with App Review to walk through the code and the game.
 
-About the game itself: it has 25 levels designed one by one, each galaxy introduces a different mechanic (portals, reverse gravity, black holes, reflective walls...), plus a daily challenge, a speed run mode, an endless mode, 37 achievements and unlockable ship skins. Even the music and sound effects are generated procedurally, not taken from asset packs. Nothing in it was copied from another app.
-
-If it helps, I can record a gameplay video or provide anything else you need. And if possible, could you tell me which apps mine was considered similar to? I'd genuinely like to understand, since this game is my own design.
-
-Thank you so much for your time.
+Thank you for your time and for helping me understand this.
 
 Vanessa Assink

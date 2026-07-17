@@ -992,8 +992,9 @@ const Music=(()=>{
 // Handled automatically by @capacitor-community/admob when initialized
 // with requestTrackingAuthorization:true. No custom modal needed.
 const ATT={
-  // ATT prompt is triggered by AdMob.initialize() on iOS 14+.
-  // The #attModal HTML is kept for web-preview purposes but hidden on native.
+  // This app does NOT track users. No App Tracking Transparency prompt is
+  // requested; AdMob serves non-personalized ads only (npa:true).
+  // The #attModal HTML is legacy web-preview markup and is hidden on native.
 };
 
 // ── AD MANAGER ─────────────────────────────────────────────
@@ -1024,7 +1025,7 @@ const AdManager={
         const {AdMob}=Capacitor.Plugins;
         if(AdMob){
           await AdMob.initialize({
-            requestTrackingAuthorization:true, // triggers ATT prompt on iOS 14+
+            requestTrackingAuthorization:false, // no ATT: app does not track users
             initializeForTesting:false,
           });
           this._initialized=true;
@@ -1056,7 +1057,7 @@ const AdManager={
     if(this.noAds||!this._initialized)return;
     try{
       const {AdMob}=Capacitor.Plugins;
-      await AdMob.prepareInterstitial({adId:this.INTERSTITIAL_ID});
+      await AdMob.prepareInterstitial({adId:this.INTERSTITIAL_ID,npa:true});
       await AdMob.showInterstitial();
     }catch(e){console.warn('AdMob interstitial error:',e);}
   },

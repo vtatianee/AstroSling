@@ -49,8 +49,6 @@
 	<true/>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-8694151594129435~5520735233</string>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>This identifier is used to show you relevant ads and measure ad performance. You can change this in Settings at any time.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

@@ -821,7 +821,16 @@ const Audio=(()=>{
     ufo()  {beep(600,.1,'sine',.15);beep(800,.08,'sine',.12,.08);beep(500,.1,'sine',.1,.15);},
     toggleSfx(){_sfxMuted=!_sfxMuted;syncSfxUI();},
     get sfxMuted(){return _sfxMuted;},
-    resumeCtx(){const c=getAC();if(c&&c.state==='suspended')c.resume();}
+    resumeCtx(){const c=getAC();if(c&&c.state==='suspended')c.resume();},
+    // Must run inside a real user gesture: iOS can leave a context that was
+    // built before any touch permanently silent, even once it reports running.
+    // Creating it here and pushing one silent buffer through fully unlocks it.
+    unlock(){
+      const c=getAC();if(!c)return;
+      if(c.state==='suspended')c.resume();
+      try{const b=c.createBuffer(1,1,22050),s=c.createBufferSource();
+        s.buffer=b;s.connect(c.destination);s.start(0);}catch(e){}
+    }
   };
 })();
 
@@ -985,6 +994,18 @@ const Music=(()=>{
       syncUI();
     },
     resume(){const c=getAC();if(c&&c.state==='suspended')c.resume();},
+    // Same iOS caveat as Audio.unlock(): build and prime the context from
+    // inside the gesture, then start the track once the clock is really running.
+    unlock(idx){
+      const c=getAC();if(!c)return;
+      try{const b=c.createBuffer(1,1,22050),s=c.createBufferSource();
+        s.buffer=b;s.connect(c.destination);s.start(0);}catch(e){}
+      const go=()=>{clearTimeout(_timer);_on=false;_idx=-1;this.play(idx);};
+      if(c.state==='suspended'){
+        const p=c.resume();
+        if(p&&p.then)p.then(go).catch(go);else go();
+      }else go();
+    },
     playRandom(){this.play(1+Math.floor(Math.random()*5));},
     get muted(){return _muted;},
     get active(){return _on;}
@@ -3575,12 +3596,21 @@ initUIBindings();
 // Show starfield on initial title screen
 const _bgCv=document.getElementById('bgStarsCanvas');
 if(_bgCv)_bgCv.style.display='block';
-// Resume AudioContext on first user interaction (required by iOS/Chrome autoplay policy)
-function _acUnlock(){Music.resume();Audio.resumeCtx();document.removeEventListener('touchstart',_acUnlock);document.removeEventListener('mousedown',_acUnlock);}
+// Audio must be created and unlocked from inside a real user gesture. Starting
+// it on a timer instead leaves iOS with a context built before any touch, which
+// can stay silent for the whole session, so the menu music starts on first tap.
+function _acUnlock(){
+  Audio.unlock();
+  Music.unlock(0);
+  document.removeEventListener('touchstart',_acUnlock);
+  document.removeEventListener('mousedown',_acUnlock);
+}
 document.addEventListener('touchstart',_acUnlock,{once:true});
 document.addEventListener('mousedown',_acUnlock,{once:true});
-// Start menu music after tiny delay so AC can init
-setTimeout(()=>Music.play(0),400);
+// iOS suspends the context whenever the app goes to the background.
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){Audio.resumeCtx();Music.resume();}
+});
 // Initialize AdMob + IAP (handles ATT prompt automatically on iOS 14+)
 AdManager.init();
 requestAnimationFrame(ts=>{lastTime=ts;requestAnimationFrame(gameLoop);});

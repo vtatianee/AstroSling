@@ -845,7 +845,10 @@ function _updateHudIcon(){
 
 // ── MUSIC ENGINE – 80s/90s Space Chiptune ────────────────
 // 6 synthesised tracks: [0]=menu, [1-5]=gameplay (random)
-const Music=(()=>{
+// Built-in procedural engine. Kept as the automatic fallback for any track
+// that has no usable audio file, so a missing asset can never leave the game
+// silent. The Music facade below decides which of the two actually plays.
+const ProcMusic=(()=>{
   let _ac=null,_mg=null;
   let _muted=false,_vol=0.26;
   let _idx=-1,_si=0,_nt=0,_timer=null,_on=false;
@@ -1009,6 +1012,113 @@ const Music=(()=>{
     playRandom(){this.play(1+Math.floor(Math.random()*5));},
     get muted(){return _muted;},
     get active(){return _on;}
+  };
+})();
+
+// ── MUSIC (licensed audio files, procedural fallback) ─────
+// Track 0 is the menu theme; 1-5 are gameplay themes picked at random per
+// level, which is what makes the music vary during a run. Drop the files in
+// audio/music/ and they take over automatically — any track whose file is
+// missing or fails to decode silently falls back to ProcMusic.
+// iOS/WKWebView only decodes MP3/M4A here, so OGG will not work.
+const MUSIC_FILES={
+  0:'audio/music/menu.mp3',
+  1:'audio/music/galaxy1.mp3',
+  2:'audio/music/galaxy2.mp3',
+  3:'audio/music/galaxy3.mp3',
+  4:'audio/music/galaxy4.mp3',
+  5:'audio/music/galaxy5.mp3'
+};
+
+const Music=(()=>{
+  const VOL=0.5, FADE_MS=700, STEP=40;
+  let _muted=false,_idx=-1,_cur=null,_fade=null,_useFile=false;
+  const _els={},_dead={};
+
+  // Load failures only surface asynchronously, so the fallback has to be driven
+  // by the error/rejection rather than decided up front, or a missing file would
+  // just leave the game silent instead of reverting to ProcMusic.
+  function fallback(idx){
+    _dead[idx]=true;delete _els[idx];
+    stopFiles();_useFile=false;_idx=idx;
+    ProcMusic.play(idx);
+  }
+
+  // NOTE: `Audio` is this file's SFX module, which shadows window.Audio, so
+  // `new Audio()` would throw here. createElement sidesteps that entirely.
+  function el(idx){
+    if(_dead[idx])return null;
+    if(_els[idx])return _els[idx];
+    const src=MUSIC_FILES[idx];if(!src)return null;
+    try{
+      const a=document.createElement('audio');
+      a.src=src;a.loop=true;a.preload='auto';a.volume=0;
+      a.addEventListener('error',()=>{
+        if(_idx===idx)fallback(idx);
+        else{_dead[idx]=true;delete _els[idx];}
+      },{once:true});
+      _els[idx]=a;return a;
+    }catch(e){_dead[idx]=true;return null;}
+  }
+
+  function stopFiles(){
+    clearInterval(_fade);_fade=null;
+    if(_cur){try{_cur.pause();_cur.currentTime=0;}catch(e){}}
+    _cur=null;
+  }
+
+  function crossfade(next,idx){
+    const prev=_cur,pv=prev?prev.volume:0,t0=Date.now(),target=_muted?0:VOL;
+    _cur=next;_idx=idx;_useFile=true;
+    clearInterval(_fade);
+    try{next.volume=0;}catch(e){}
+    const pr=next.play();
+    if(pr&&pr.catch)pr.catch(err=>{
+      // Blocked purely for want of a gesture: the file is fine, retry later.
+      if(err&&err.name==='NotAllowedError')return;
+      if(_cur===next)fallback(idx);
+    });
+    _fade=setInterval(()=>{
+      const k=Math.min(1,(Date.now()-t0)/FADE_MS);
+      try{next.volume=target*k;}catch(e){}
+      if(prev&&prev!==next){try{prev.volume=pv*(1-k);}catch(e){}}
+      if(k>=1){
+        clearInterval(_fade);_fade=null;
+        if(prev&&prev!==next){try{prev.pause();prev.currentTime=0;}catch(e){}}
+      }
+    },STEP);
+  }
+
+  return{
+    play(idx){
+      const a=el(idx);
+      if(a){
+        if(_cur===a&&_idx===idx&&!a.paused)return;
+        ProcMusic.stop();crossfade(a,idx);return;
+      }
+      stopFiles();_useFile=false;_idx=idx;
+      ProcMusic.play(idx);
+    },
+    stop(){stopFiles();_useFile=false;ProcMusic.stop();},
+    // Delegating keeps ProcMusic's flag and the button labels in lockstep.
+    toggle(){
+      _muted=!_muted;
+      if(_cur){try{_cur.volume=_muted?0:VOL;}catch(e){}}
+      ProcMusic.toggle();
+    },
+    resume(){
+      if(_useFile&&_cur&&_cur.paused){const p=_cur.play();if(p&&p.catch)p.catch(()=>{});}
+      ProcMusic.resume();
+    },
+    // Runs inside the first user gesture (see _acUnlock).
+    unlock(idx){
+      const a=el(idx);
+      if(a){crossfade(a,idx);return;}
+      _useFile=false;_idx=idx;ProcMusic.unlock(idx);
+    },
+    playRandom(){this.play(1+Math.floor(Math.random()*5));},
+    get muted(){return _muted;},
+    get active(){return _useFile?!!(_cur&&!_cur.paused):ProcMusic.active;}
   };
 })();
 

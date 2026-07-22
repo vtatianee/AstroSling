@@ -27,6 +27,9 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  /* Top inset so controls clear the notch / Dynamic Island. The status bar is
+     hidden on iOS, but the cutout is physical, so top-anchored UI still needs it. */
+  :root{--safe-top:env(safe-area-inset-top,0px);}
   html{overflow:hidden;height:100%;}
   body{background:#04000e;display:flex;justify-content:center;align-items:center;height:100vh;overflow:hidden;font-family:'Nunito',sans-serif;touch-action:none;user-select:none;}
   /* Keep the 390:844 design aspect but fill as much of the screen as possible
@@ -63,7 +66,7 @@
   #attModal,#aboutModal{z-index:20;}
   /* About button lives INSIDE titleScreen so it inherits its z-index */
   #aboutBtn{
-    position:absolute;top:16px;left:16px;
+    position:absolute;top:calc(16px + var(--safe-top));left:16px;
     background:rgba(255,255,255,.06);backdrop-filter:blur(12px);
     border:1px solid rgba(255,255,255,.14);border-radius:20px;
     color:rgba(255,255,255,.75);font-family:'Fredoka One',cursive;
@@ -73,7 +76,7 @@
   #aboutBtn:active{transform:scale(.92);background:rgba(255,255,255,.1);}
 
   /* LEVEL SELECT */
-  #levelScreen{background:radial-gradient(ellipse at 50% 20%,rgba(10,40,120,.45) 0%,transparent 55%),linear-gradient(180deg,#040018 0%,#020010 100%);padding:0;overflow-y:auto;justify-content:flex-start;padding-top:64px;}
+  #levelScreen{background:radial-gradient(ellipse at 50% 20%,rgba(10,40,120,.45) 0%,transparent 55%),linear-gradient(180deg,#040018 0%,#020010 100%);padding:0;overflow-y:auto;justify-content:flex-start;padding-top:calc(64px + var(--safe-top));}
   .galaxy-label{font-family:'Fredoka One',cursive;font-size:10px;color:rgba(100,180,255,.55);letter-spacing:4px;text-transform:uppercase;margin:16px 0 8px;grid-column:1/-1;display:flex;align-items:center;gap:8px;}
   .galaxy-label::before,.galaxy-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(100,160,255,.28),transparent);}
   .level-btn{height:76px;border-radius:14px;color:#fff;font-family:'Fredoka One',cursive;font-size:19px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
@@ -90,7 +93,7 @@
 
   /* Menu button — top-left */
   #hudMenuBtn{
-    position:absolute;top:14px;left:14px;
+    position:absolute;top:calc(14px + var(--safe-top));left:14px;
     width:42px;height:42px;border-radius:12px;
     background:rgba(6,0,22,.72);backdrop-filter:blur(14px);
     border:1px solid rgba(255,255,255,.14);
@@ -103,7 +106,7 @@
 
   /* Sound button — top-right */
   #hudSoundBtn{
-    position:absolute;top:14px;right:14px;
+    position:absolute;top:calc(14px + var(--safe-top));right:14px;
     width:42px;height:42px;border-radius:12px;
     background:rgba(6,0,22,.72);backdrop-filter:blur(14px);
     border:1px solid rgba(255,255,255,.14);
@@ -445,7 +448,7 @@
   }
   #aboutModal.active{opacity:1;pointer-events:all;}
   .about-header{
-    width:100%;padding:22px 20px 18px;
+    width:100%;padding:calc(22px + var(--safe-top)) 20px 18px;
     display:flex;align-items:center;justify-content:space-between;
     border-bottom:1px solid rgba(255,255,255,.08);
     position:sticky;top:0;background:rgba(4,0,18,.82);backdrop-filter:blur(16px);z-index:2;
@@ -507,7 +510,7 @@
     <!-- About button inside title screen, top-left -->
     <button id="aboutBtn" onclick="Game.showAbout()">ℹ️ About</button>
     <!-- Skin button top-right -->
-    <button onclick="Game.showSkins()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:20px;padding:6px 10px;cursor:pointer;touch-action:manipulation;z-index:30;line-height:1">🎨</button>
+    <button onclick="Game.showSkins()" style="position:absolute;top:calc(16px + var(--safe-top));right:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:20px;padding:6px 10px;cursor:pointer;touch-action:manipulation;z-index:30;line-height:1">🎨</button>
     <canvas id="titlePlanetCanvas" width="160" height="160" style="margin-bottom:18px"></canvas>
     <div class="title-logo">ASTRO<br>SLING</div>
     <div class="title-sub">Arcade Space Puzzles</div>
@@ -550,9 +553,9 @@
 
   <!-- LEVEL SELECT -->
   <div id="levelScreen" class="screen">
-    <div style="font-family:'Fredoka One',cursive;font-size:22px;letter-spacing:4px;color:#70c0ff;margin-bottom:14px;position:absolute;top:18px;left:50%;transform:translateX(-50%);white-space:nowrap;text-shadow:0 0 12px rgba(80,180,255,.5)">GALAXIES</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:22px;letter-spacing:4px;color:#70c0ff;margin-bottom:14px;position:absolute;top:calc(18px + var(--safe-top));left:50%;transform:translateX(-50%);white-space:nowrap;text-shadow:0 0 12px rgba(80,180,255,.5)">GALAXIES</div>
     <div id="levelGrid" style="width:100%;max-width:360px;padding:0 14px 50px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;overflow-y:auto;margin-top:20px"></div>
-    <div style="position:absolute;top:14px;left:14px">
+    <div style="position:absolute;top:calc(14px + var(--safe-top));left:14px">
       <button class="btn btn-ghost btn-sm" onclick="Game.showTitle()">← BACK</button>
     </div>
   </div>

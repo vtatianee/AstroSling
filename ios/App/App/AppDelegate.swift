@@ -9,9 +9,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Allow Web Audio API to play without requiring a user gesture and to
-        // continue playing when the device silent switch is on (game music/SFX).
-        try? AVAudioSession.sharedInstance().setCategory(.ambient, options: .mixWithOthers)
+        // Game music/SFX must keep playing when the ring/silent switch is on, so
+        // use .playback (.ambient is silenced by the hardware mute switch).
+        // .mixWithOthers keeps any music the user is already playing alive.
+        // Players can still mute the game from the in-game sound buttons.
+        try? AVAudioSession.sharedInstance().setCategory(.playback, options: .mixWithOthers)
         try? AVAudioSession.sharedInstance().setActive(true)
         // Initialize Google Mobile Ads SDK as early as possible.
         // ATT authorization request is handled by @capacitor-community/admob at JS level.

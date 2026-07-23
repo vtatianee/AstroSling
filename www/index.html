@@ -763,7 +763,7 @@
     <div style="font-size:62px;margin-bottom:6px">💫</div>
     <div class="lose-title">MISSED!</div>
     <div style="color:rgba(255,255,255,.38);font-size:12px;letter-spacing:3px;margin:10px 0 20px">NO SHOTS LEFT</div>
-    <button class="btn btn-orange" onclick="Game.restartFromLevel1()">TRY AGAIN</button>
+    <button class="btn btn-orange" onclick="Game.restart()">TRY AGAIN</button>
     <div style="height:8px"></div>
     <button class="btn btn-ghost btn-sm" onclick="Game.goToMainMenu()">BACK TO MENU</button>
   </div>
@@ -1615,12 +1615,23 @@ const DailyChallenge={
   getLevelIdx(){const r=seededRand(this._seed()+1);return Math.floor(r()*LEVELS.length);},
   start(){
     const mod=this.getModifier();const lvl=this.getLevelIdx();
+    this._prevTime=LaunchTimer.TIME;      // restore the exact prior value on reset
+    GameState._startingDaily=true;        // tells startLevel to keep this setup
     if(mod==='rush_5s')LaunchTimer.TIME=5;
     if(mod==='1_shot')GameState._dailyMaxShots=1;
     if(mod==='2_shots')GameState._dailyMaxShots=2;
     if(mod==='dark')document.body.classList.add('daily-dark');
     GameState.daily=true;GameState.dailyMod=mod;
     this._showCard(mod,lvl,()=>GameState.startLevel(lvl));
+  },
+  // Clears every daily modifier. Called on finish, on leaving to the menu, and
+  // before any non-daily level start, so modifiers can never leak into normal
+  // play (which previously turned regular levels dark / 1-shot and broke them).
+  reset(){
+    LaunchTimer.TIME=this._prevTime||10;
+    delete GameState._dailyMaxShots;
+    GameState.daily=false;GameState.dailyMod=null;
+    document.body.classList.remove('daily-dark');
   },
   _showCard(mod,lvl,cb){
     const el=document.createElement('div');
@@ -1641,10 +1652,7 @@ const DailyChallenge={
     },2400);
   },
   finish(won){
-    LaunchTimer.TIME=10;
-    delete GameState._dailyMaxShots;
-    GameState.daily=false;GameState.dailyMod=null;
-    document.body.classList.remove('daily-dark');
+    this.reset();
     GameState.playing=false;GameState.paused=false;
     if(won){this.markDone();Achievements._unlock('daily_ace');}
     const el=document.createElement('div');
@@ -2686,8 +2694,10 @@ const LevelTransition=(()=>{
         stars>0?'★'.repeat(Math.min(stars,3)):'';
       document.getElementById('lvltPts').textContent=
         pts>0?`+${pts} PTS`:'';
+      // No "NEXT LEVEL" affordance here — the win screen is the only place
+      // with an actual next-level button, so the overlay stays a pure flourish.
       document.getElementById('lvltNext').textContent=
-        isLastLevel?'🌌 ALL GALAXIES CLEARED!':'NEXT LEVEL →';
+        isLastLevel?'🌌 ALL GALAXIES CLEARED!':'';
 
       // Reset text animations (remove .in before showing)
       ['lvltComplete','lvltStars','lvltPts','lvltNext'].forEach(id=>{
@@ -2703,8 +2713,13 @@ const LevelTransition=(()=>{
       setTimeout(()=>document.getElementById('lvltPts').classList.add('in'),380);
       setTimeout(()=>document.getElementById('lvltNext').classList.add('in'),500);
 
-      // Auto-advance after 2.2s → hide overlay → fire callback
-      _timer=setTimeout(()=>{
+      // Auto-advance after 2.2s, OR let a tap skip straight to the win screen.
+      // finish() is idempotent so the timer and the tap can't both fire it.
+      let _done=false;
+      const finish=()=>{
+        if(_done)return;_done=true;
+        clearTimeout(_timer);
+        el.removeEventListener('click',finish);
         el.style.transition='opacity .35s';
         el.style.opacity='0';
         setTimeout(()=>{
@@ -2717,7 +2732,9 @@ const LevelTransition=(()=>{
           });
           if(cb)cb();
         },350);
-      },2200);
+      };
+      el.addEventListener('click',finish);
+      _timer=setTimeout(finish,2200);
     }
   };
 })();
@@ -2895,6 +2912,16 @@ function generateEndlessLevel(score){
 // ── GAME STATE ────────────────────────────────────────────
 const MAX_ATTEMPTS=5; // ← 5 shots per level
 
+// Maps a level index to one of the 5 gameplay tracks based on its galaxy, so
+// music is tied to the galaxy rather than the individual (short) level. There
+// are more galaxies than tracks, so galaxies cycle through 1-5.
+function galaxyTrack(idx){
+  const g=(LEVELS[idx]&&LEVELS[idx].galaxy)||'';
+  const m=g.match(/Galaxy\s*(\d+)/i);
+  const n=m?parseInt(m[1],10):(idx+1);
+  return 1+((n-1)%5);
+}
+
 const GameState={
   currentLevelIndex:0,attempts:MAX_ATTEMPTS,starsCollected:0,
   playing:false,paused:false,endless:false,endlessScore:0,endlessBest:0,
@@ -2914,6 +2941,11 @@ const GameState={
     Achievements.init();SkinManager.init();
   },
   startLevel(idx){
+    // Any normal level start clears leftover daily-challenge modifiers so they
+    // can't bleed into regular play. The daily flow sets _startingDaily first
+    // so its own modifiers survive this guard.
+    if(this._startingDaily){this._startingDaily=false;}
+    else{DailyChallenge.reset();}
     this.currentLevelIndex=idx;
     this.attempts=this._dailyMaxShots||MAX_ATTEMPTS;
     this._attemptsMax=this.attempts;
@@ -2926,7 +2958,11 @@ const GameState={
     const igm=document.getElementById('inGameMenu');if(igm)igm.classList.remove('active');
     const hud=document.getElementById('hud');if(hud)hud.style.display='block';
     this.updateHUD();
-    Music.playRandom();
+    // One gameplay track per galaxy: derive a stable index from the level's
+    // galaxy so the same track keeps looping across the levels of that galaxy
+    // (Music.play early-returns when the track is unchanged) and only
+    // crossfades when a new galaxy begins.
+    Music.play(galaxyTrack(idx));
     LaunchTimer.startCountdown();
     // Show tutorial on first visit to level 1
     if(idx===0&&Tutorial.shouldShow()){
@@ -2934,6 +2970,7 @@ const GameState={
     }
   },
   startEndlessMode(){
+    DailyChallenge.reset();   // endless is never a daily; clear any leftover modifiers
     this.endless=true;this.endlessScore=0;this.attempts=MAX_ATTEMPTS;this.starsCollected=0;
     this.playing=true;this.paused=false;
     PhysicsEngine.reset(generateEndlessLevel(0));this.updateHUD();showScreen(null);
@@ -3144,6 +3181,7 @@ const Game={
     const m=document.getElementById('inGameMenu');
     if(m)m.classList.remove('active');
     GameState.playing=false;GameState.paused=false;
+    DailyChallenge.reset();   // drop daily modifiers so they don't leak into normal play
     SpeedRun.stop();
     Music.play(0);
     showScreen('titleScreen');

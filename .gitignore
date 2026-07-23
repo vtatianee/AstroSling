@@ -2,3 +2,6 @@
 .claude/
 node_modules/
 
+
+# Cópia gerada de audio/ para o webDir do Capacitor (recriada por tools/prepare-music.sh)
+www/audio/

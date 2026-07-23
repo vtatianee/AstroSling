@@ -31,9 +31,16 @@ if [[ ! -f "$MAP" ]]; then
   echo "Mapeamento não encontrado: $MAP" >&2
   exit 1
 fi
-if ! command -v ffmpeg >/dev/null 2>&1; then
-  echo "ffmpeg não encontrado. Instale com:  brew install ffmpeg" >&2
-  exit 1
+# ffmpeg é opcional: sem ele, um MP3 de origem é apenas copiado. O jogo toca
+# igual; o que se perde é a normalização de volume entre as faixas (e a
+# recompressão). Qualquer outro formato continua exigindo ffmpeg, porque o
+# iOS não decodifica OGG/FLAC.
+HAVE_FFMPEG=0
+command -v ffmpeg >/dev/null 2>&1 && HAVE_FFMPEG=1
+if [[ $HAVE_FFMPEG -eq 0 ]]; then
+  echo "ffmpeg não encontrado — MP3 será copiado sem normalizar volume."
+  echo "Para nivelar o volume entre as faixas:  brew install ffmpeg"
+  echo
 fi
 
 mkdir -p "$DEST"
@@ -66,12 +73,20 @@ while IFS='|' read -r slot pattern; do
   fi
 
   src="${matches[0]}"
-  echo "  OK        $slot.mp3  <-  $(basename "$src")"
-  ffmpeg -hide_banner -loglevel error -y \
-    -i "$src" \
-    -af loudnorm=I=-16:TP=-1.5:LRA=11 \
-    -codec:a libmp3lame -b:a 128k -ar 44100 \
-    "$DEST/${slot}.mp3"
+  if [[ $HAVE_FFMPEG -eq 1 ]]; then
+    echo "  OK        $slot.mp3  <-  $(basename "$src")   (normalizado)"
+    ffmpeg -hide_banner -loglevel error -y \
+      -i "$src" \
+      -af loudnorm=I=-16:TP=-1.5:LRA=11 \
+      -codec:a libmp3lame -b:a 128k -ar 44100 \
+      "$DEST/${slot}.mp3"
+  elif [[ "$(printf '%s' "$src" | tr '[:upper:]' '[:lower:]')" == *.mp3 ]]; then
+    echo "  OK        $slot.mp3  <-  $(basename "$src")   (cópia)"
+    cp "$src" "$DEST/${slot}.mp3"
+  else
+    echo "  PULADO    $slot  ($(basename "$src") não é MP3 e precisa de ffmpeg)"
+    missing=$((missing+1)); continue
+  fi
   ok=$((ok+1))
 done < "$MAP"
 

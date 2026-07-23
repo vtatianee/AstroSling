@@ -1,0 +1,32 @@
+# Mapeamento das faixas do AstroSling.
+#
+# Formato:  <slot>|<trecho do nome do arquivo baixado>
+#
+# O trecho é procurado no nome do arquivo, sem diferenciar maiúsculas.
+# Basta ser único o bastante para não casar com duas faixas.
+#
+# Fonte das faixas: Pixabay (Pixabay Content License — uso comercial
+# permitido, sem exigência de atribuição). Confira a licença na página de
+# cada faixa e guarde o print/link como comprovante.
+
+# menu   — Summer Pop            https://pixabay.com/music/dance-summer-pop-569732/
+menu|summer-pop
+
+# galaxy1 — Summer Dance         https://pixabay.com/music/dance-summer-dance-569734/
+galaxy1|summer-dance
+
+# galaxy2 — Retro Game Arcade    https://pixabay.com/music/video-games-retro-game-arcade-236133/
+galaxy2|retro-game-arcade
+
+# galaxy3 — Summer Beach Party (Stellar)
+#                                https://pixabay.com/music/pop-summer-beach-party-music-stellar-566553/
+galaxy3|beach-party
+
+# galaxy4 — Future Bass (Say My Name)
+#                                https://pixabay.com/music/future-bass-future-bass-music-version-3-say-my-name-570520/
+galaxy4|future-bass
+
+# galaxy5 — Summer               https://pixabay.com/music/dance-summer-569733/
+# Precisa vir depois das outras "summer-*" para não casar com elas primeiro;
+# o script exige correspondência única, então avisa se houver ambiguidade.
+galaxy5|summer-569733

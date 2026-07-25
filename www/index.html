@@ -1068,7 +1068,7 @@ const Music=(()=>{
   }
 
   function crossfade(next,idx){
-    const prev=_cur,pv=prev?prev.volume:0,t0=Date.now(),target=_muted?0:VOL;
+    const prev=_cur,pv=prev?prev.volume:0,t0=Date.now();
     _cur=next;_idx=idx;_useFile=true;
     clearInterval(_fade);
     try{next.volume=0;}catch(e){}
@@ -1080,8 +1080,11 @@ const Music=(()=>{
     });
     _fade=setInterval(()=>{
       const k=Math.min(1,(Date.now()-t0)/FADE_MS);
-      try{next.volume=target*k;}catch(e){}
-      if(prev&&prev!==next){try{prev.volume=pv*(1-k);}catch(e){}}
+      // Read _muted live each tick so toggling mute mid-crossfade takes effect
+      // immediately instead of being overwritten by a frozen target.
+      const tv=_muted?0:VOL;
+      try{next.volume=tv*k;}catch(e){}
+      if(prev&&prev!==next){try{prev.volume=_muted?0:pv*(1-k);}catch(e){}}
       if(k>=1){
         clearInterval(_fade);_fade=null;
         if(prev&&prev!==next){try{prev.pause();prev.currentTime=0;}catch(e){}}
@@ -3749,11 +3752,17 @@ if(_bgCv)_bgCv.style.display='block';
 // can stay silent for the whole session, so the menu music starts on first tap.
 function _acUnlock(){
   Audio.unlock();
-  Music.unlock(0);
+  // Start the menu track only if the player is still on a menu screen; if the
+  // very first gesture was already a tap into a level, don't yank a gameplay
+  // track back to the menu one.
+  const s=GameState&&GameState.playing?-1:0;
+  if(s===0)Music.unlock(0);else{Audio.resumeCtx();Music.resume();}
   document.removeEventListener('touchstart',_acUnlock);
+  document.removeEventListener('pointerdown',_acUnlock);
   document.removeEventListener('mousedown',_acUnlock);
 }
 document.addEventListener('touchstart',_acUnlock,{once:true});
+document.addEventListener('pointerdown',_acUnlock,{once:true});
 document.addEventListener('mousedown',_acUnlock,{once:true});
 // iOS suspends the context whenever the app goes to the background.
 document.addEventListener('visibilitychange',()=>{

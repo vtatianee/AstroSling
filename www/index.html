@@ -3576,14 +3576,10 @@ window.addEventListener('resize',scaleBgCanvas);
   function frame(ts){
     const dt=Math.min((ts-lastTs)*.001,.05);lastTs=ts;t+=dt;
 
+    // Transparent background: the animated starfield behind the title screen
+    // already fills the page, so painting an opaque square here just draws a
+    // visible box over it instead of blending in.
     c.clearRect(0,0,S,S);
-
-    // ── Deep space bg ──
-    const bg=c.createRadialGradient(CX,CY,10,CX,CY,S*.7);
-    bg.addColorStop(0,'rgba(10,0,30,1)');
-    bg.addColorStop(.5,'rgba(4,0,16,1)');
-    bg.addColorStop(1,'rgba(0,0,8,1)');
-    c.fillStyle=bg;c.fillRect(0,0,S,S);
 
     // ── Neon stars ──
     STARS.forEach(s=>{

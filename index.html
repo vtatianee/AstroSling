@@ -56,7 +56,7 @@
   #menuScreen{background:transparent;gap:12px;}
 
   /* Full-screen neon starfield background canvas — always visible behind everything */
-  #bgStarsCanvas{position:fixed;top:50%;left:50%;width:390px;height:844px;z-index:0;pointer-events:none;transform:translate(-50%,-50%);}
+  #bgStarsCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
   /* Planet canvas inside title screen — fixed size, NOT filling container */
   #titlePlanetCanvas{width:160px;height:160px;flex-shrink:0;display:block;}
   /* Screens sit above both canvases */
@@ -501,7 +501,7 @@
 </style>
 </head>
 <body>
-<canvas id="bgStarsCanvas" width="390" height="844"></canvas>
+<canvas id="bgStarsCanvas"></canvas>
 <div id="gameContainer">
   <canvas id="gameCanvas"></canvas>
 
@@ -3351,28 +3351,29 @@ Game.startFirstLevel=function(event){
 };
 
 // ── FULLSCREEN NEON STARFIELD BACKGROUND ─────────────────
+// Renders at the real viewport size (not a stretched 390x844 canvas), so it
+// stays crisp and richly detailed on any aspect ratio — including boxier
+// screens like iPad, where the portrait gameplay area is letterboxed and this
+// layer is what fills the space around it instead of flat black bars.
 (()=>{
   const cv=document.getElementById('bgStarsCanvas');
   if(!cv)return;
   const c=cv.getContext('2d');
-  const BW=390,BH=844;
 
-  const NSTARS=120;
-  const bgStars=Array.from({length:NSTARS},()=>{
-    const hue=Math.random()<.55?185+Math.random()*35:270+Math.random()*50;
-    return{x:Math.random()*BW,y:Math.random()*BH,r:.4+Math.random()*1.6,
-      phase:Math.random()*Math.PI*2,speed:.4+Math.random()*.9,hue,
-      bright:Math.random()<.15};
-  });
-
-  const NEBULAE=[
-    {x:60, y:140,rx:120,ry:85, hue:270,a:.055},
-    {x:330,y:280,rx:95, ry:130,hue:200,a:.045},
-    {x:180,y:580,rx:140,ry:95, hue:290,a:.04},
-    {x:50, y:710,rx:85, ry:65, hue:220,a:.038},
-    {x:345,y:760,rx:75, ry:85, hue:260,a:.042},
+  // Positions/sizes as fractions of the viewport, derived from the original
+  // fixed 390x844 composition, so the layout scales to any screen size.
+  const NEBULAE_F=[
+    {fx:.1538,fy:.1659,frx:.3077,fry:.1007,hue:270,a:.055},
+    {fx:.8462,fy:.3318,frx:.2436,fry:.1540,hue:200,a:.045},
+    {fx:.4615,fy:.6872,frx:.3590,fry:.1126,hue:290,a:.04},
+    {fx:.1282,fy:.8412,frx:.2179,fry:.0770,hue:220,a:.038},
+    {fx:.8846,fy:.9005,frx:.1923,fry:.1007,hue:260,a:.042},
   ];
+  // Same star density as the original 390x844/120-star composition.
+  const STAR_DENSITY=120/(390*844);
 
+  let BW=390,BH=844,dpr=1;
+  let bgStars=[],_bgGrad=null,_vigGrad=null,_nebCv=null;
   const shoots=[];let shootTimer=3;
 
   function spawnShoot(){
@@ -3381,31 +3382,52 @@ Game.startFirstLevel=function(event){
       life:1,maxLife:1,len:55+Math.random()*90});
   }
 
-  // Pre-bake static gradients (created once, reused every frame)
-  const _bgGrad=(()=>{
-    const g=c.createLinearGradient(0,0,0,BH);
-    g.addColorStop(0,'#04000e');g.addColorStop(.4,'#06001a');
-    g.addColorStop(.75,'#08002a');g.addColorStop(1,'#04000e');
-    return g;
-  })();
-  const _vigGrad=(()=>{
-    const g=c.createRadialGradient(BW/2,BH/2,BH*.18,BW/2,BH/2,BH*.78);
-    g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.48)');
-    return g;
-  })();
-  // Pre-bake static nebulae to an offscreen canvas (drawn once)
-  const _nebCv=document.createElement('canvas');
-  _nebCv.width=BW;_nebCv.height=BH;
-  const _nebC=_nebCv.getContext('2d');
-  NEBULAE.forEach(n=>{
-    const g=_nebC.createRadialGradient(n.x,n.y,0,n.x,n.y,Math.max(n.rx,n.ry));
-    g.addColorStop(0,`hsla(${n.hue},100%,55%,${n.a*1.6})`);
-    g.addColorStop(.5,`hsla(${n.hue},80%,40%,${n.a})`);
-    g.addColorStop(1,'rgba(0,0,0,0)');
-    _nebC.save();_nebC.translate(n.x,n.y);
-    _nebC.scale(n.rx/Math.max(n.rx,n.ry),n.ry/Math.max(n.rx,n.ry));
-    _nebC.fillStyle=g;_nebC.beginPath();_nebC.arc(0,0,Math.max(n.rx,n.ry),0,Math.PI*2);_nebC.fill();
-    _nebC.restore();
+  function setup(){
+    BW=window.innerWidth;BH=window.innerHeight;
+    dpr=Math.min(window.devicePixelRatio||1,2);
+    cv.width=BW*dpr;cv.height=BH*dpr;
+    c.setTransform(dpr,0,0,dpr,0,0);
+
+    const nstars=Math.max(80,Math.min(260,Math.round(BW*BH*STAR_DENSITY)));
+    bgStars=Array.from({length:nstars},()=>{
+      const hue=Math.random()<.55?185+Math.random()*35:270+Math.random()*50;
+      return{x:Math.random()*BW,y:Math.random()*BH,r:.4+Math.random()*1.6,
+        phase:Math.random()*Math.PI*2,speed:.4+Math.random()*.9,hue,
+        bright:Math.random()<.15};
+    });
+    shoots.length=0;shootTimer=3;
+
+    _bgGrad=(()=>{
+      const g=c.createLinearGradient(0,0,0,BH);
+      g.addColorStop(0,'#04000e');g.addColorStop(.4,'#06001a');
+      g.addColorStop(.75,'#08002a');g.addColorStop(1,'#04000e');
+      return g;
+    })();
+    const diag=Math.hypot(BW,BH);
+    _vigGrad=(()=>{
+      const g=c.createRadialGradient(BW/2,BH/2,diag*.1634,BW/2,BH/2,diag*.708);
+      g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.48)');
+      return g;
+    })();
+    _nebCv=document.createElement('canvas');
+    _nebCv.width=BW;_nebCv.height=BH;
+    const _nebC=_nebCv.getContext('2d');
+    NEBULAE_F.forEach(nf=>{
+      const n={x:nf.fx*BW,y:nf.fy*BH,rx:nf.frx*BW,ry:nf.fry*BH,hue:nf.hue,a:nf.a};
+      const g=_nebC.createRadialGradient(n.x,n.y,0,n.x,n.y,Math.max(n.rx,n.ry));
+      g.addColorStop(0,`hsla(${n.hue},100%,55%,${n.a*1.6})`);
+      g.addColorStop(.5,`hsla(${n.hue},80%,40%,${n.a})`);
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      _nebC.save();_nebC.translate(n.x,n.y);
+      _nebC.scale(n.rx/Math.max(n.rx,n.ry),n.ry/Math.max(n.rx,n.ry));
+      _nebC.fillStyle=g;_nebC.beginPath();_nebC.arc(0,0,Math.max(n.rx,n.ry),0,Math.PI*2);_nebC.fill();
+      _nebC.restore();
+    });
+  }
+  setup();
+  let _resizeT=null;
+  window.addEventListener('resize',()=>{
+    clearTimeout(_resizeT);_resizeT=setTimeout(setup,150);
   });
 
   let bgT=0,bgLast=0;
@@ -3467,15 +3489,6 @@ Game.startFirstLevel=function(event){
   requestAnimationFrame(ts=>{bgLast=ts;requestAnimationFrame(bgFrame);});
 })();
 
-// ── SCALE BG STARS CANVAS TO FILL VIEWPORT ───────────────
-function scaleBgCanvas(){
-  const bg=document.getElementById('bgStarsCanvas');
-  if(!bg)return;
-  const s=Math.max(window.innerWidth/390,window.innerHeight/844)*1.05;
-  bg.style.transform=`translate(-50%,-50%) scale(${s})`;
-}
-scaleBgCanvas();
-window.addEventListener('resize',scaleBgCanvas);
 
 // ── TITLE ANIMATION — Neon Glow: Ship Orbiting Planet ────
 (()=>{
